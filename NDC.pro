@@ -21,3 +21,6 @@ HEADERS  += mainwindow.h \
     database.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    res/res.qrc

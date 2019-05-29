@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>action_icons/add_patient.png</file>
+        <file>action_icons/med_journal.png</file>
+        <file>action_icons/tooth_card.png</file>
+        <file>action_icons/edit_patient.png</file>
+    </qresource>
+</RCC>

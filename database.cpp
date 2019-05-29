@@ -50,12 +50,12 @@ bool DataBase::RestoreDataBase() {
 }
 
 bool DataBase::CreateDataBase() {
-//    QSqlQuery query;
+    QSqlQuery query;
 
-//    if(!query.exec (CREATE_MODELS_TABLE))  {
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
+    if(!query.exec (CREATE_PATIENTS_TABLE))  {
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
 //    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)){
 //        last_error = sdb.lastError ().text ();
 //        return false;
@@ -114,8 +114,8 @@ double DataBase::SelectSum(const QString &query) {
     return sel_query.value (0).toDouble ();
 }
 
-QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to) {
-    QVector<QVariantList> table;
+//QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to) {
+//    QVector<QVariantList> table;
 //    QLocale loc(QLocale::Ukrainian, QLocale::Ukraine);
 //    QSqlQuery query;
 //    query.exec ("SELECT " + table_name + ".*, " + MODELS_TABLE + "." + CATEGORY + ", "
@@ -146,8 +146,8 @@ QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QSt
 //        }
 //        table.append (row);
 //    }
-    return table;
-}
+//    return table;
+//}
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString& equal_sign, const QString &equal) {
     QSqlQuery query;
