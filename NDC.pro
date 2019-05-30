@@ -14,13 +14,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    database.cpp
+    database.cpp \
+    addpatientdialog.cpp
 
 HEADERS  += mainwindow.h \
     general.h \
-    database.h
+    database.h \
+    addpatientdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    addpatientdialog.ui
 
 RESOURCES += \
     res/res.qrc

@@ -1,14 +1,34 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "addpatientdialog.h"
 
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    sdb = data_base;
     toolbar = new QToolBar(this);
     BuildToolBar ();
+
+    sql_model = new QSqlTableModel(this);
+    sql_model->setTable (PATIENTS_TABLE);
+
+    filter_model = new QSortFilterProxyModel(this);
+    filter_model->setSourceModel (sql_model);
+    filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
+    filter_model->setFilterKeyColumn (BY_SURNAME);
+    ui->patients_table->setModel (filter_model);
+
+    for(int col = 0; col < 3; ++col) {
+        sql_model->setHeaderData(col + 2, Qt::Horizontal, PATIENTS_TABLE_HEADERS[col]);
+    }
+    ui->search_cb->addItems (PATIENTS_TABLE_HEADERS);
+    PatientTableInit();
+
+    QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
+    Update(0);
 }
 
 void MainWindow::BuildToolBar() {
@@ -21,12 +41,66 @@ void MainWindow::BuildToolBar() {
     addToolBar(Qt::TopToolBarArea, toolbar);
 }
 
+void MainWindow::PatientTableInit() {
+    for (int col = 0; col < sql_model->columnCount(); ++col) {
+        if (!(col == 2 || col == 3 || col == 4)){
+            ui->patients_table->setColumnHidden(col, true);
+        }
+    }
+    ui->patients_table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    ui->patients_table->verticalHeader ()->setDefaultSectionSize (18);
+    ui->patients_table->verticalHeader()->setVisible(false);
+    ui->patients_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->patients_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->patients_table->resizeColumnsToContents();
+    ui->patients_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->patients_table->horizontalHeader()->setStretchLastSection(true);
+    ui->patients_table->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
+    ui->patients_table->setSortingEnabled (true);
+}
+
+void MainWindow::Update(int row) {
+    sql_model->select ();
+    sql_model->sort (0, Qt::AscendingOrder);
+    ui->patients_table->selectRow (row);
+}
+
 void MainWindow::onActionAddPatient() {
-    qDebug() << "patient";
+    AddPatientDialog* add_patient = new AddPatientDialog (sdb, this);
+    if(add_patient->exec () == QDialog::Accepted) {
+        QPixmap pic(add_patient->GetPhotoPath ());
+        QByteArray pic_byte_arr;
+        QBuffer buff(&pic_byte_arr);
+        buff.open (QIODevice::WriteOnly);
+        pic.save (&buff, "JPG");
+
+        QVariantList data = QVariantList() << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss")
+                                           << add_patient->GetSurname ()
+                                           << add_patient->GetName ()
+                                           << add_patient->GetFName ()
+                                           << add_patient->GetBDate ()
+                                           << add_patient->GetSex()
+                                           << add_patient->GetCity()
+                                           << add_patient->GetTelNumber ()
+                                           << pic_byte_arr;
+        QStringList columns = {INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, PATIENT_PHOTO};
+        if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (PATIENTS_TABLE, columns),
+                                       sdb->GenerateBindValues (columns),
+                                       data)) {
+            ui->statusBar->showMessage ("Невдалось створити картку пацієнта! Проблема з підключеням до бази даних");
+            return;
+        }
+        Update(filter_model->rowCount ());
+        ui->statusBar->showMessage ("Додано пацієнта " + add_patient->GetSurname () + " " + add_patient->GetName ().left (1) + ".");
+    }
 }
 
 void MainWindow::onActionAddEvent() {
-    qDebug() << "event";
+
+}
+
+void MainWindow::ShowPatientInfo() {
+
 }
 
 MainWindow::~MainWindow() {

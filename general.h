@@ -82,5 +82,16 @@ const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
               + TEL_NUMBER + " TEXT NOT NULL, "
               + PATIENT_PHOTO + " BLOB)";
 
+const QStringList PATIENTS_TABLE_HEADERS = {
+    "Прізвище",
+    "Ім'я",
+    "По-батькові"
+};
+
+enum SearchType {
+    BY_SURNAME,
+    BY_NAME
+};
+
 #endif // GENERAL
 

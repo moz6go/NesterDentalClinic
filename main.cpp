@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         QMessageBox::critical (nullptr, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
         return -1;
     }
-    MainWindow w;
+    MainWindow w(sdb);
     w.show();
 
     return a.exec();
