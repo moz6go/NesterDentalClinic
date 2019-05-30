@@ -15,11 +15,11 @@ class MainWindow : public QMainWindow {
     QToolBar* toolbar;
 
     QAction* action_add_patient;
-
+    QAction* action_add_event;
     void BuildToolBar();
 private slots:
     void onActionAddPatient();
-
+    void onActionAddEvent();
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

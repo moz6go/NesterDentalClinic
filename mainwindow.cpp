@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::BuildToolBar() {
     action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
+    action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
     toolbar->addSeparator ();
 
     toolbar->setMovable (false);
@@ -21,7 +22,11 @@ void MainWindow::BuildToolBar() {
 }
 
 void MainWindow::onActionAddPatient() {
-    qDebug() << 123;
+    qDebug() << "patient";
+}
+
+void MainWindow::onActionAddEvent() {
+    qDebug() << "event";
 }
 
 MainWindow::~MainWindow() {

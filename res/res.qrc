@@ -4,5 +4,6 @@
         <file>action_icons/med_journal.png</file>
         <file>action_icons/tooth_card.png</file>
         <file>action_icons/edit_patient.png</file>
+        <file>action_icons/add_event.png</file>
     </qresource>
 </RCC>
