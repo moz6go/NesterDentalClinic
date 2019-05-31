@@ -27,6 +27,8 @@ private slots:
     void onActionAddPatient();
     void onActionAddEvent();
     void ShowPatientInfo();
+    void SetSearchType(QString type);
+    void SearchTextChanged(QString text);
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~MainWindow();

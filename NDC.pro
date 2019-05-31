@@ -27,3 +27,5 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     res/res.qrc
+
+RC_ICONS = main_icon.ico

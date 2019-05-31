@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Nester Dental Clinic</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>main_icon.ico</normaloff>main_icon.ico</iconset>
+  </property>
   <property name="toolTip">
    <string/>
   </property>
@@ -32,9 +36,7 @@
    <string/>
   </property>
   <property name="styleSheet">
-   <string notr="true"> QMainWindow {
-     background-color: rgb(185,254,255);
- }</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -92,6 +94,9 @@
             <property name="placeholderText">
              <string>Пошук...</string>
             </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -121,9 +126,6 @@
             <family>Comic Sans MS</family>
             <pointsize>9</pointsize>
            </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"> QTableView { background-color: rgb(200, 251, 255) }</string>
           </property>
          </widget>
         </item>
@@ -187,11 +189,12 @@
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -217,11 +220,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -247,11 +251,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -277,11 +282,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -307,11 +313,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -337,11 +344,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -367,11 +375,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -403,11 +412,12 @@ background-color: rgba(250,250,250,0.2)
               <property name="font">
                <font>
                 <family>Comic Sans MS</family>
+                <pointsize>9</pointsize>
                </font>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
-background-color: rgba(250,250,250,0.2)
+background-color: rgba(250,250,250,0.2);
 }</string>
               </property>
               <property name="readOnly">
@@ -490,6 +500,24 @@ background-color: rgba(250,250,250,0.2)
               </property>
               <item>
                <widget class="QPushButton" name="visit_journal_pb">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="sizeIncrement">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <family>Comic Sans MS</family>
@@ -524,6 +552,24 @@ background-color: rgba(250,250,250,0.2)
               </item>
               <item>
                <widget class="QPushButton" name="toot_card_pb">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="sizeIncrement">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <family>Comic Sans MS</family>
@@ -558,6 +604,24 @@ background-color: rgba(250,250,250,0.2)
               </item>
               <item>
                <widget class="QPushButton" name="edit_client_pb">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="sizeIncrement">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <family>Comic Sans MS</family>
@@ -694,9 +758,6 @@ background-color: rgba(250,250,250,0.2)
          <font>
           <pointsize>9</pointsize>
          </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"> QTableWidget {   background-color: rgb(200, 251, 255) ; }</string>
         </property>
        </widget>
       </item>

@@ -12,8 +12,12 @@ AddPatientDialog::AddPatientDialog(DataBase* data_base, QWidget *parent) :
     sdb = data_base;
 
     ui->sex_cb->addItems (QStringList() << "Чоловіча" << "Жіноча");
+    ui->tel_number_le->setInputMask ("38 (000) 000 00 00;_");
 
     QObject::connect (ui->load_photo_pb, &QPushButton::clicked, this, &AddPatientDialog::LoadPhoto);
+    QObject::connect (ui->s_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
+    QObject::connect (ui->name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
+    QObject::connect (ui->f_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
     QObject::connect (ui->add_pb, &QPushButton::clicked, this, &QDialog::accept);
     QObject::connect (ui->cancel_pb, &QPushButton::clicked, this, &QDialog::reject);
 }
@@ -23,6 +27,12 @@ void AddPatientDialog::LoadPhoto() {
     if (!photo_path.isEmpty ()){
         ui->patient_photo_lbl->setPixmap (QPixmap(photo_path).scaledToWidth (ui->patient_photo_lbl->width ()));
     }
+}
+
+void AddPatientDialog::EnableAddButton() {
+    ui->add_pb->setEnabled (!ui->s_name_le->text ().isEmpty () &&
+                            !ui->name_le->text ().isEmpty () &&
+                            !ui->f_name_le->text ().isEmpty ());
 }
 
 QString AddPatientDialog::GetPhotoPath() {

@@ -16,6 +16,7 @@ class AddPatientDialog : public QDialog
     QString photo_path;
 private slots:
     void LoadPhoto();
+    void EnableAddButton();
 public:
     QString GetPhotoPath();
     QString GetSurname();

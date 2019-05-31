@@ -28,12 +28,16 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     ui->search_cb->addItems (PATIENTS_TABLE_HEADERS);
     PatientTableInit();
 
+    QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
+    QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     Update(0);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    ui->patient_photo_lbl->setPixmap (patient_photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+    if (!patient_photo.isNull ()){
+        ui->patient_photo_lbl->setPixmap (patient_photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+    }
     QMainWindow::resizeEvent(event);
 }
 
@@ -113,13 +117,30 @@ void MainWindow::ShowPatientInfo() {
     else {
         ui->patient_photo_lbl->setPixmap (QPixmap(":/action_icons/default_user.png"));
     }
-    ui->surname_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 2)).toString ());
-    ui->name_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 3)).toString ());
-    ui->f_name_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 4)).toString ());
-    ui->b_date_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 5)).toString ());
-    ui->sex_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 6)).toString ());
-    ui->city_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 7)).toString ());
-    ui->tel_number_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 8)).toString ());
+    ui->surname_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 2)).toString ());
+    ui->name_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 3)).toString ());
+    ui->f_name_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 4)).toString ());
+    ui->b_date_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 5)).toString ());
+    ui->sex_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 6)).toString ());
+    ui->city_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 7)).toString ());
+    ui->tel_number_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 8)).toString ());
+}
+
+void MainWindow::SetSearchType(QString type) {
+    if(type == PATIENTS_TABLE_HEADERS[0]) {
+        filter_model->setFilterKeyColumn (BY_SURNAME);
+    }
+    else if (type == PATIENTS_TABLE_HEADERS[1]) {
+        filter_model->setFilterKeyColumn (BY_NAME);
+    }
+    else if (type == PATIENTS_TABLE_HEADERS[2]) {
+        filter_model->setFilterKeyColumn (BY_F_NAME);
+    }
+}
+
+void MainWindow::SearchTextChanged(QString text) {
+    filter_model->setFilterFixedString (text);
+    Update(ui->patients_table->currentIndex ().row ());
 }
 
 MainWindow::~MainWindow() {

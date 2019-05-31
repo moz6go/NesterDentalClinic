@@ -89,8 +89,9 @@ const QStringList PATIENTS_TABLE_HEADERS = {
 };
 
 enum SearchType {
-    BY_SURNAME,
-    BY_NAME
+    BY_SURNAME = 2,
+    BY_NAME,
+    BY_F_NAME
 };
 
 #endif // GENERAL
