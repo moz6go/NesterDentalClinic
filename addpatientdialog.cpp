@@ -21,10 +21,7 @@ AddPatientDialog::AddPatientDialog(DataBase* data_base, QWidget *parent) :
 void AddPatientDialog::LoadPhoto() {
     photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", QDir::homePath (), "*.jpg *.png *.bmp");
     if (!photo_path.isEmpty ()){
-        // показуємо фото
-    }
-    else {
-        // показуєм юзер_пік
+        ui->patient_photo_lbl->setPixmap (QPixmap(photo_path).scaledToWidth (ui->patient_photo_lbl->width ()));
     }
 }
 

@@ -15,9 +15,11 @@ class MainWindow : public QMainWindow {
     QSqlTableModel* sql_model;
     QSortFilterProxyModel* filter_model;
     QToolBar* toolbar;
+    QPixmap patient_photo;
 
     QAction* action_add_patient;
     QAction* action_add_event;
+    void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
     void PatientTableInit();
     void Update(int row);

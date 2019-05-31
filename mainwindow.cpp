@@ -9,6 +9,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
 {
     ui->setupUi(this);
     sdb = data_base;
+    patient_photo = QPixmap(":/action_icons/default_user.png");
     toolbar = new QToolBar(this);
     BuildToolBar ();
 
@@ -31,6 +32,11 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     Update(0);
 }
 
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    ui->patient_photo_lbl->setPixmap (patient_photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+    QMainWindow::resizeEvent(event);
+}
+
 void MainWindow::BuildToolBar() {
     action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
     action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
@@ -43,6 +49,7 @@ void MainWindow::BuildToolBar() {
 
 void MainWindow::PatientTableInit() {
     for (int col = 0; col < sql_model->columnCount(); ++col) {
+        ui->patients_table->setColumnWidth(col,  ui->patients_table->width () / 3);
         if (!(col == 2 || col == 3 || col == 4)){
             ui->patients_table->setColumnHidden(col, true);
         }
@@ -52,10 +59,8 @@ void MainWindow::PatientTableInit() {
     ui->patients_table->verticalHeader()->setVisible(false);
     ui->patients_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->patients_table->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->patients_table->resizeColumnsToContents();
     ui->patients_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->patients_table->horizontalHeader()->setStretchLastSection(true);
-    ui->patients_table->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     ui->patients_table->setSortingEnabled (true);
 }
 
@@ -63,6 +68,7 @@ void MainWindow::Update(int row) {
     sql_model->select ();
     sql_model->sort (0, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
+    ShowPatientInfo();
 }
 
 void MainWindow::onActionAddPatient() {
@@ -100,7 +106,20 @@ void MainWindow::onActionAddEvent() {
 }
 
 void MainWindow::ShowPatientInfo() {
-
+    patient_photo.loadFromData (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 9)).toByteArray ());
+    if (!patient_photo.isNull ()) {
+        ui->patient_photo_lbl->setPixmap (patient_photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+    }
+    else {
+        ui->patient_photo_lbl->setPixmap (QPixmap(":/action_icons/default_user.png"));
+    }
+    ui->surname_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 2)).toString ());
+    ui->name_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 3)).toString ());
+    ui->f_name_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 4)).toString ());
+    ui->b_date_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 5)).toString ());
+    ui->sex_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 6)).toString ());
+    ui->city_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 7)).toString ());
+    ui->tel_number_le->setText (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 8)).toString ());
 }
 
 MainWindow::~MainWindow() {
