@@ -29,6 +29,7 @@ private slots:
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
+    void onEditClientClicked();
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~MainWindow();

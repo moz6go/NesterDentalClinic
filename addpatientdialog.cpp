@@ -2,17 +2,34 @@
 #include "ui_addpatientdialog.h"
 
 
-AddPatientDialog::AddPatientDialog(DataBase* data_base, QWidget *parent) :
+AddPatientDialog::AddPatientDialog(const QVariantList& row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddPatientDialog)
 {
     ui->setupUi(this);
     setModal (true);
     photo_path = "";
-    sdb = data_base;
-
     ui->sex_cb->addItems (QStringList() << "Чоловіча" << "Жіноча");
     ui->tel_number_le->setInputMask ("38 (000) 000 00 00;_");
+
+    if (!row.isEmpty ()){
+        ui->s_name_le->setText (row.at (2).toString ());
+        ui->name_le->setText (row.at (3).toString ());
+        ui->f_name_le->setText (row.at (4).toString ());
+        ui->b_date_de->setDate (row.at (5).toDate ());
+        ui->sex_cb->setCurrentText (row.at (6).toString ());
+        ui->city_le->setText (row.at (7).toString ());
+        ui->tel_number_le->setText (row.at (8).toString ());
+
+        QPixmap photo;
+        photo.loadFromData (row.at (9).toByteArray ());
+        if (!photo.isNull ()){
+            ui->patient_photo_lbl->setPixmap(photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+        }
+
+        setWindowTitle ("Редагувати картку клієнта");
+        EnableAddButton();
+    }
 
     QObject::connect (ui->load_photo_pb, &QPushButton::clicked, this, &AddPatientDialog::LoadPhoto);
     QObject::connect (ui->s_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
@@ -31,8 +48,7 @@ void AddPatientDialog::LoadPhoto() {
 
 void AddPatientDialog::EnableAddButton() {
     ui->add_pb->setEnabled (!ui->s_name_le->text ().isEmpty () &&
-                            !ui->name_le->text ().isEmpty () &&
-                            !ui->f_name_le->text ().isEmpty ());
+                            !ui->name_le->text ().isEmpty ());
 }
 
 QString AddPatientDialog::GetPhotoPath() {
@@ -64,7 +80,7 @@ QString AddPatientDialog::GetCity() {
 }
 
 QString AddPatientDialog::GetTelNumber() {
-    return ui->tel_number_le->text ();
+    return ui->tel_number_le->text ().size () < 18 ? "" : ui->tel_number_le->text ();
 }
 
 AddPatientDialog::~AddPatientDialog() {

@@ -22,9 +22,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>260</x>
      <y>230</y>
-     <width>271</width>
+     <width>168</width>
      <height>28</height>
     </rect>
    </property>
@@ -35,7 +35,7 @@
        <bool>false</bool>
       </property>
       <property name="text">
-       <string>Додати</string>
+       <string>ОК</string>
       </property>
      </widget>
     </item>

@@ -17,10 +17,9 @@ public:
     bool ConnectToDataBase(QString db_path);
     bool CreateDataBase();
     void CloseDataBase();
-    bool InsertDataIntoTable (const QString& query_str,
-                              const QStringList& bind_values_list,
-                              const QVariantList& data);
-    QString GenerateInsertQuery(QString table, QStringList columns);
+    bool UpdateInsertData (const QString& query_str,  const QStringList& bind_values_list, const QVariantList& data);
+    QString GenerateInsertQuery(const QString& table, const QStringList& columns);
+    QString GenerateUpdateQuery(const QString& table, const QStringList& columns, const QString& where, const QString& equal);
     QStringList GenerateBindValues(QStringList columns);
 
     double SelectSum(const QString& qeury);
@@ -67,6 +66,7 @@ public:
                            const QString& equal1,
                            const QString& equal2,
                            const int& col_count);
+
 };
 
 #endif // DATABASE_H

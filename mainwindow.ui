@@ -160,7 +160,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Дані</string>
+           <string>Дані пацієнта</string>
           </property>
          </widget>
         </item>

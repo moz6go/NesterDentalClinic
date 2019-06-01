@@ -56,26 +56,6 @@ bool DataBase::CreateDataBase() {
         last_error = sdb.lastError ().text ();
         return false;
     }
-//    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)){
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
-//    if(!query.exec (CREATE_BRANDS_TABLE)){
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
-//    if(!query.exec (CREATE_CATEGORIES_TABLE)) {
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
-//    if(!query.exec (CREATE_SEASONS_TABLE)) {
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
-//    if(!query.exec (CREATE_SOLD_GOODS_TABLE)){
-//        last_error = sdb.lastError ().text ();
-//        return false;
-//    }
     return true;
 }
 
@@ -86,13 +66,14 @@ void DataBase::CloseDataBase(){
     sdb.removeDatabase(connection);
 }
 
-bool DataBase::InsertDataIntoTable (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data) {
+bool DataBase::UpdateInsertData (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data) {
     QSqlQuery query;
     query.prepare (query_str);
     for (int i = 0; i < bind_values_list.size (); ++i) {
         query.bindValue (bind_values_list[i], data[i]);
     }
     if(!query.exec ()) {
+        qDebug() << query.lastError ();
         return false;
     }
     else {
@@ -223,11 +204,13 @@ QVariantList DataBase::SelectRow(const QString &select,
     return data;
 }
 
-QString DataBase::GenerateInsertQuery(QString table, QStringList columns) {
-    QString query = "INSERT INTO " + table +" (";
+QString DataBase::GenerateInsertQuery(const QString& table, const QStringList& columns) {
+    QString query;
+    query = "INSERT INTO " + table + " (";
+
     for (int col = 0; col < columns.size(); ++col) {
         if(col == columns.size () - 1) {
-            query += columns[col] + ")";
+            query += columns[col] + ") ";
         }
         else {
             query += columns[col] + ", ";
@@ -238,12 +221,26 @@ QString DataBase::GenerateInsertQuery(QString table, QStringList columns) {
 
     for (int col = 0; col < columns.size(); ++col) {
         if(col == columns.size () - 1){
-            query += ":" + columns[col] + ");";
+            query += ":" + columns[col] + ")";
         }
         else {
             query += ":" + columns[col] + ", ";
         }
     }
+    return query;
+}
+
+QString DataBase::GenerateUpdateQuery(const QString &table, const QStringList &columns, const QString &where, const QString &equal) {
+    QString query = "UPDATE " + table + " SET ";
+    for (int col = 0; col < columns.size (); ++col) {
+        if(col == columns.size () - 1) {
+            query += columns.at(col) + " = :" + columns.at(col);
+        }
+        else {
+            query += columns.at(col) + " = :" + columns.at(col) + ", ";
+        }
+    }
+    query += " WHERE " + where + " = " + equal;
     return query;
 }
 

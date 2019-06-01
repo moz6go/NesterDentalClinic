@@ -12,7 +12,6 @@ class AddPatientDialog;
 class AddPatientDialog : public QDialog
 {
     Q_OBJECT
-    DataBase* sdb;
     QString photo_path;
 private slots:
     void LoadPhoto();
@@ -26,7 +25,7 @@ public:
     QString GetSex();
     QString GetCity();
     QString GetTelNumber();
-    explicit AddPatientDialog(DataBase* data_base, QWidget *parent = nullptr);
+    explicit AddPatientDialog(const QVariantList& row, QWidget *parent = nullptr);
     ~AddPatientDialog();
 
 private:

@@ -42,7 +42,7 @@ const int SIZE_WID_2 = 24;
     #if defined(QT_DEBUG)
         const QString DB_PATH = QDir::currentPath () + "/ndc_db.sqlite3";
     #else
-        const QString DB_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/NesterDentalClinic/ndc_db.sqlite3";
+        const QString DB_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/NDC/ndc_db.sqlite3";
     #endif
 #else
     const QString DB_PATH = QDir::currentPath () + "/ndc_db.sqlite3";
@@ -92,6 +92,11 @@ enum SearchType {
     BY_SURNAME = 2,
     BY_NAME,
     BY_F_NAME
+};
+
+enum UpdateInsert {
+    INSERT,
+    UPDATE
 };
 
 #endif // GENERAL
