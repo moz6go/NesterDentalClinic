@@ -12,26 +12,47 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     patient_photo = QPixmap(":/action_icons/default_user.png");
     toolbar = new QToolBar(this);
     BuildToolBar ();
+    ui->search_cb->addItems (QStringList() << PATIENTS_TABLE_HEADERS[2] << PATIENTS_TABLE_HEADERS[3] << PATIENTS_TABLE_HEADERS[4]) ;
 
-    sql_model = new QSqlTableModel(this);
-    sql_model->setTable (PATIENTS_TABLE);
+    patients_model = new QSqlTableModel(this);
+    patients_model->setTable (PATIENTS_TABLE);
+    RenameHeaders(patients_model->columnCount(), patients_model, PATIENTS_TABLE_HEADERS);
+    patients_filter_model = new QSortFilterProxyModel(this);
+    patients_filter_model->setSourceModel (patients_model);
+    patients_filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
+    patients_filter_model->setFilterKeyColumn (BY_SURNAME);
+    ui->patients_table->setModel (patients_filter_model);
 
-    filter_model = new QSortFilterProxyModel(this);
-    filter_model->setSourceModel (sql_model);
-    filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
-    filter_model->setFilterKeyColumn (BY_SURNAME);
-    ui->patients_table->setModel (filter_model);
+    events_model = new QSqlTableModel(this);
+    events_model->setTable(EVENTS_TABLE);
+    RenameHeaders(events_model->columnCount(), events_model, EVENTS_TABLE_HEADERS);
+    events_filter_model = new QSortFilterProxyModel(this);
+    events_filter_model->setSourceModel(events_model);
+    events_filter_model->setFilterKeyColumn(1);
+    events_filter_model->setFilterFixedString(QDate::currentDate().toString("yyyy-MM-dd"));
+    ui->events_table->setModel(events_filter_model);
 
-    for(int col = 0; col < 3; ++col) {
-        sql_model->setHeaderData(col + 2, Qt::Horizontal, PATIENTS_TABLE_HEADERS[col]);
+    for (int col = 0; col < patients_model->columnCount(); ++col) {
+        ui->patients_table->setColumnWidth(col,  ui->patients_table->width () / 3);
+        if (!(col == 2 || col == 3 || col == 4)){
+            ui->patients_table->setColumnHidden(col, true);
+        }
     }
-    ui->search_cb->addItems (PATIENTS_TABLE_HEADERS);
-    PatientTableInit();
+    for (int col = 0; col < events_model->columnCount(); ++col) {
+        if (!(col == 2 || col == 3 || col == 4 || col == 5)){
+            ui->events_table->setColumnHidden(col, true);
+        }
+    }
+
+    TableInit(ui->patients_table);
+    TableInit(ui->events_table);
 
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     QObject::connect (ui->edit_client_pb, &QPushButton::clicked, this, &MainWindow::onEditClientClicked);
+
+    QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::DateSelected );
     Update(0);
 }
 
@@ -53,29 +74,30 @@ void MainWindow::BuildToolBar() {
     addToolBar(Qt::TopToolBarArea, toolbar);
 }
 
-void MainWindow::PatientTableInit() {
-    for (int col = 0; col < sql_model->columnCount(); ++col) {
-        ui->patients_table->setColumnWidth(col,  ui->patients_table->width () / 3);
-        if (!(col == 2 || col == 3 || col == 4)){
-            ui->patients_table->setColumnHidden(col, true);
-        }
+void MainWindow::RenameHeaders(int column_count, QSqlTableModel *model, const QStringList &headers_list) {
+    for(int col = 0; col < column_count; ++col) {
+        model->setHeaderData(col, Qt::Horizontal, headers_list[col]);
     }
-    ui->patients_table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    ui->patients_table->verticalHeader ()->setDefaultSectionSize (18);
-    ui->patients_table->verticalHeader()->setVisible(false);
-    ui->patients_table->setShowGrid(false);
-    ui->patients_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->patients_table->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->patients_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->patients_table->horizontalHeader()->setStretchLastSection(true);
-    ui->patients_table->setSortingEnabled (true);
+}
+
+void MainWindow::TableInit(QTableView *table) {
+    table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    table->verticalHeader ()->setDefaultSectionSize (18);
+    table->verticalHeader()->setVisible(false);
+    table->setShowGrid(false);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->setSortingEnabled (true);
 }
 
 void MainWindow::Update(int row) {
-    sql_model->select ();
-    sql_model->sort (0, Qt::AscendingOrder);
+    events_model->select();
+    patients_model->select ();
+    patients_model->sort (0, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
-    ui->edit_client_pb->setEnabled (sql_model->rowCount ());
+    ui->edit_client_pb->setEnabled (patients_model->rowCount ());
     ShowPatientInfo();
 }
 
@@ -96,17 +118,18 @@ void MainWindow::onActionAddPatient() {
                               add_patient->GetSex(),
                               add_patient->GetCity(),
                               add_patient->GetTelNumber (),
+                              add_patient->GetIllnesses(),
                               pic_byte_arr };
 
-        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, PATIENT_PHOTO };
+        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES, PATIENT_PHOTO };
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (PATIENTS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
             ui->statusBar->showMessage ("Невдалось створити картку пацієнта! Проблема з підключеням до бази даних");
             return;
         }
-        Update(filter_model->rowCount ());
-        ui->statusBar->showMessage ("Додано пацієнта " + add_patient->GetSurname () + " " + add_patient->GetName ().left (1) + ".");
+        Update(patients_filter_model->rowCount ());
+        ui->statusBar->showMessage ("Додано пацієнта " + add_patient->GetSurname () + " " + add_patient->GetName ().left (1) + "." + add_patient->GetFName().left(1) + ".");
     }
 }
 
@@ -115,7 +138,7 @@ void MainWindow::onActionAddEvent() {
 }
 
 void MainWindow::onEditClientClicked() {
-    QVariantList row = sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 0)).toString (), 10);
+    QVariantList row = sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 0)).toString (), patients_model->columnCount());
     AddPatientDialog* edit_patient = new AddPatientDialog (row, this);
     if(edit_patient->exec() == QDialog::Accepted){
         QPixmap pic(edit_patient->GetPhotoPath ());
@@ -130,8 +153,9 @@ void MainWindow::onEditClientClicked() {
                               edit_patient->GetBDate (),
                               edit_patient->GetSex(),
                               edit_patient->GetCity(),
-                              edit_patient->GetTelNumber () };
-        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER };
+                              edit_patient->GetTelNumber (),
+                              edit_patient->GetIllnesses() };
+        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
 
         if (!edit_patient->GetPhotoPath ().isEmpty ()){
             data.append ( pic_byte_arr);
@@ -144,44 +168,47 @@ void MainWindow::onEditClientClicked() {
             ui->statusBar->showMessage ("Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
             return;
         }
-        Update(filter_model->rowCount ());
-        ui->statusBar->showMessage ("Відредаговано картку пацієнта " + edit_patient->GetSurname () + " " + edit_patient->GetName ().left (1) + ".");
-
-
+        Update(ui->patients_table->currentIndex ().row ());
+        ui->statusBar->showMessage ("Відредаговано картку пацієнта " + edit_patient->GetSurname () + " " + edit_patient->GetName ().left (1) + "." + edit_patient->GetFName().left(1) + ".");
     }
 }
 
+void MainWindow::DateSelected() {
+    events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString("yyyy-MM-dd"));
+}
+
 void MainWindow::ShowPatientInfo() {
-    patient_photo.loadFromData (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 9)).toByteArray ());
+    patient_photo.loadFromData (patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 10)).toByteArray ());
     if (!patient_photo.isNull ()) {
         ui->patient_photo_lbl->setPixmap (patient_photo.scaledToWidth (ui->patient_photo_lbl->width ()));
     }
     else {
         ui->patient_photo_lbl->setPixmap (QPixmap(":/action_icons/default_user.png"));
     }
-    ui->surname_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 2)).toString ());
-    ui->name_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 3)).toString ());
-    ui->f_name_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 4)).toString ());
-    ui->b_date_le->setText(QDate::fromString (filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 5)).toString (), "yyyy-MM-dd").toString ("dd.MM.yyyy"));
-    ui->sex_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 6)).toString ());
-    ui->city_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 7)).toString ());
-    ui->tel_number_le->setText(filter_model->data(filter_model->index (ui->patients_table->currentIndex ().row (), 8)).toString ());
+    ui->surname_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 2)).toString ());
+    ui->name_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 3)).toString ());
+    ui->f_name_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 4)).toString ());
+    ui->b_date_le->setText(QDate::fromString (patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 5)).toString (), "yyyy-MM-dd").toString ("dd.MM.yyyy"));
+    ui->sex_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 6)).toString ());
+    ui->city_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 7)).toString ());
+    ui->tel_number_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 8)).toString ());
+    ui->illnesses_le->setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), 9)).toString ());
 }
 
 void MainWindow::SetSearchType(QString type) {
-    if(type == PATIENTS_TABLE_HEADERS[0]) {
-        filter_model->setFilterKeyColumn (BY_SURNAME);
+    if(type == PATIENTS_TABLE_HEADERS[2]) {
+        patients_filter_model->setFilterKeyColumn (BY_SURNAME);
     }
-    else if (type == PATIENTS_TABLE_HEADERS[1]) {
-        filter_model->setFilterKeyColumn (BY_NAME);
+    else if (type == PATIENTS_TABLE_HEADERS[3]) {
+        patients_filter_model->setFilterKeyColumn (BY_NAME);
     }
-    else if (type == PATIENTS_TABLE_HEADERS[2]) {
-        filter_model->setFilterKeyColumn (BY_F_NAME);
+    else if (type == PATIENTS_TABLE_HEADERS[4]) {
+        patients_filter_model->setFilterKeyColumn (BY_F_NAME);
     }
 }
 
 void MainWindow::SearchTextChanged(QString text) {
-    filter_model->setFilterFixedString (text);
+    patients_filter_model->setFilterFixedString (text);
     Update(ui->patients_table->currentIndex ().row ());
 }
 

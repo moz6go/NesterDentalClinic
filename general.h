@@ -50,6 +50,7 @@ const int SIZE_WID_2 = 24;
 
 // tables
 const QString PATIENTS_TABLE = "patients";
+const QString EVENTS_TABLE = "events";
 const QString VISITS_TABLE = "visits";
 const QString SERVICES_TABLE = "services";
 const QString DISEASES_TABLE = "diseases";
@@ -64,10 +65,15 @@ const QString B_DATE = "b_date";
 const QString SEX = "sex";
 const QString CITY = "city";
 const QString TEL_NUMBER = "tel_number";
+const QString ILLNESSES = "illnesses";
 const QString PATIENT_PHOTO = "patient_photo";
 
-const QString VISIT_ID = "visit_id";
-const QString VISIT_DATE = "visit_date";
+const QString EVENT_ID = "event_id";
+const QString EVENT_DATE = "event_date";
+const QString EVENT_TIME = "event_time";
+const QString PATIENT = "patient";
+const QString EVENT_STATUS = "event_status";
+const QString COMMENT = "comment";
 
 // create queries
 const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
@@ -80,12 +86,40 @@ const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
               + SEX + " TEXT NOT NULL, "
               + CITY + " TEXT NOT NULL, "
               + TEL_NUMBER + " TEXT NOT NULL, "
+              + ILLNESSES + " TEXT NOT NULL, "
               + PATIENT_PHOTO + " BLOB)";
 
+const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
+                + EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+                + EVENT_DATE + " TEXT NOT NULL, "
+                + EVENT_TIME + " TEXT NOT NULL, "
+                + PATIENT + " TEXT NOT NULL, "
+                + EVENT_STATUS + " TEXT NOT NULL, "
+                + COMMENT + " TEXT, "
+                + PATIENT_ID + " INTEGER)";
+
 const QStringList PATIENTS_TABLE_HEADERS = {
+    "Код пацієта",
+    "Дата заведення картки",
     "Прізвище",
     "Ім'я",
-    "По-батькові"
+    "По-батькові",
+    "Дата народження",
+    "Стать",
+    "Місто/село",
+    "Номер телефону",
+    "Алергічні та хронічні захворювання",
+    "Фото"
+};
+
+const QStringList EVENTS_TABLE_HEADERS = {
+    "Код прийому",
+    "Дата прийму",
+    "Час прийому",
+    "Пацієнт",
+    "Статус",
+    "Примітка",
+    "Код пацієнта"
 };
 
 enum SearchType {
@@ -94,9 +128,11 @@ enum SearchType {
     BY_F_NAME
 };
 
-enum UpdateInsert {
-    INSERT,
-    UPDATE
+enum EventStatus {
+    ACTIVE,
+    OVERDUE,
+    CANCELED,
+    EXECUTED
 };
 
 #endif // GENERAL

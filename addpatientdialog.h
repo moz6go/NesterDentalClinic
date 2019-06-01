@@ -25,6 +25,7 @@ public:
     QString GetSex();
     QString GetCity();
     QString GetTelNumber();
+    QString GetIllnesses();
     explicit AddPatientDialog(const QVariantList& row, QWidget *parent = nullptr);
     ~AddPatientDialog();
 

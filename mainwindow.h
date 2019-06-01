@@ -12,8 +12,10 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
     Ui::MainWindow *ui;
     DataBase* sdb;
-    QSqlTableModel* sql_model;
-    QSortFilterProxyModel* filter_model;
+    QSqlTableModel* patients_model;
+    QSqlTableModel* events_model;
+    QSortFilterProxyModel* patients_filter_model;
+    QSortFilterProxyModel* events_filter_model;
     QToolBar* toolbar;
     QPixmap patient_photo;
 
@@ -21,7 +23,8 @@ class MainWindow : public QMainWindow {
     QAction* action_add_event;
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
-    void PatientTableInit();
+    void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
+    void TableInit(QTableView* table);
     void Update(int row);
 private slots:
     void onActionAddPatient();
@@ -30,6 +33,7 @@ private slots:
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
     void onEditClientClicked();
+    void DateSelected();
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~MainWindow();

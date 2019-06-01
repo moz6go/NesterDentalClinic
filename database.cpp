@@ -56,6 +56,10 @@ bool DataBase::CreateDataBase() {
         last_error = sdb.lastError ().text ();
         return false;
     }
+    if(!query.exec (CREATE_EVENTS_TABLE))  {
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
     return true;
 }
 
