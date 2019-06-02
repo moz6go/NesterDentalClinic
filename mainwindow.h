@@ -3,6 +3,8 @@
 
 #include "general.h"
 #include "database.h"
+#include "addpatientdialog.h"
+#include "addeventdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,7 +35,8 @@ private slots:
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
     void onEditClientClicked();
-    void DateSelected();
+    void ShowEventsInSelectedDate();
+    void ShowEventsBySelectedPatient();
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~MainWindow();

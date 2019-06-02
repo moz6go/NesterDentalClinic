@@ -6,5 +6,6 @@
         <file>action_icons/edit_patient.png</file>
         <file>action_icons/add_event.png</file>
         <file>action_icons/default_user.png</file>
+        <file>action_icons/add_patient_from_db.png</file>
     </qresource>
 </RCC>
