@@ -56,7 +56,6 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowEventsBySelectedPatient);
-    QObject::connect (ui->edit_client_pb, &QPushButton::clicked, this, &MainWindow::onEditClientClicked);
 
     QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::ShowEventsInSelectedDate );
 
@@ -72,8 +71,11 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 
 void MainWindow::BuildToolBar() {
     action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
-    action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
+    action_edit_patient = toolbar->addAction(QPixmap(":/action_icons/edit_patient.png"), "Редагувати дані пацієнта", this, SLOT(onActionEditClient()));
+    action_tooth_card = toolbar->addAction(QPixmap(":/action_icons/tooth_card.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionToothCard()));
+    action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionVisitHistory()));
     toolbar->addSeparator ();
+    action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
 
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
@@ -102,7 +104,7 @@ void MainWindow::Update(int row) {
     patients_model->select ();
     patients_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
-    ui->edit_client_pb->setEnabled (patients_model->rowCount ());
+    action_edit_patient->setEnabled (patients_model->rowCount ());
     ShowPatientInfo();
 }
 
@@ -164,7 +166,7 @@ void MainWindow::onActionAddEvent() {
     }
 }
 
-void MainWindow::onEditClientClicked() {
+void MainWindow::onActionEditClient() {
     QVariantList row = sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount());
     AddPatientDialog* edit_patient = new AddPatientDialog (row, this);
     if(edit_patient->exec() == QDialog::Accepted){
@@ -198,6 +200,14 @@ void MainWindow::onEditClientClicked() {
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Відредаговано картку пацієнта " + edit_patient->GetSurname () + " " + edit_patient->GetName ().left (1) + "." + edit_patient->GetFName().left(1) + ".");
     }
+}
+
+void MainWindow::onActionToothCard() {
+
+}
+
+void MainWindow::onActionVisitHistory() {
+
 }
 
 void MainWindow::ShowEventsInSelectedDate() {

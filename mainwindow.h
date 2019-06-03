@@ -22,7 +22,11 @@ class MainWindow : public QMainWindow {
     QPixmap patient_photo;
 
     QAction* action_add_patient;
+    QAction* action_edit_patient;
+    QAction* action_tooth_card;
+    QAction* action_visit_history;
     QAction* action_add_event;
+
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
     void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
@@ -30,11 +34,13 @@ class MainWindow : public QMainWindow {
     void Update(int row);
 private slots:
     void onActionAddPatient();
+    void onActionEditClient();
+    void onActionToothCard();
+    void onActionVisitHistory();
     void onActionAddEvent();
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
-    void onEditClientClicked();
     void ShowEventsInSelectedDate();
     void ShowEventsBySelectedPatient();
 public:
