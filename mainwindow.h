@@ -41,7 +41,7 @@ private slots:
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
-    void ShowEventsInSelectedDate();
+    void ShowEventsBySelectedDate();
     void ShowEventsBySelectedPatient();
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);

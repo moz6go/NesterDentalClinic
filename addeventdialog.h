@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "general.h"
+#include "database.h"
 
 namespace Ui {
 class AddEventDialog;
@@ -12,12 +13,19 @@ class AddEventDialog : public QDialog
 {
     Q_OBJECT
     Ui::AddEventDialog *ui;
-    QVariantList row;
+    QVariantList* row;
+    DataBase* sdb;
+private slots:
+    void SetTimeTo(QTime time_from);
+    void SetMinTimeFrom();
+    void EnabledOkButton();
+    void CheckFreeTime();
 public:
-    explicit AddEventDialog(const QVariantList& curr_row, QWidget *parent = nullptr);
+    explicit AddEventDialog(DataBase* data_base, QVariantList* curr_row, QWidget *parent = nullptr);
     QString GetPatient();
     QString GetDate();
-    QString GetTime();
+    QString GetTimeFrom();
+    QString GetTimeTo();
     QString GetComment();
     QString GetPatientId();
     ~AddEventDialog();

@@ -50,7 +50,7 @@ const int SIZE_WID_2 = 24;
 const QString DATE_FORMAT = "dd.MM.yyyy";
 const QString TIME_FORMAT = "hh:mm";
 const QString SQL_DATE_FORMAT = "yyyy-MM-dd";
-const QString SQL_TIME_FORMAT = "hh:mm:ss";
+//const QString SQL_TIME_FORMAT = "hh:mm";
 const QString SQL_DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
 // tables
 const QString PATIENTS_TABLE = "patients";
@@ -75,7 +75,8 @@ const QString PATIENT_PHOTO = "patient_photo";
 const QString EVENT_ID = "event_id";
 const QString EVENT_INIT_DATE = "event_init_date";
 const QString EVENT_DATE = "event_date";
-const QString EVENT_TIME = "event_time";
+const QString EVENT_TIME_FROM = "event_time_from";
+const QString EVENT_TIME_TO = "event_time_to";
 const QString PATIENT = "patient";
 const QString EVENT_STATUS = "event_status";
 const QString COMMENT = "comment";
@@ -98,7 +99,8 @@ const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
                 + EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
                 + EVENT_INIT_DATE + " TEXT NOT NULL, "
                 + EVENT_DATE + " TEXT NOT NULL, "
-                + EVENT_TIME + " TEXT NOT NULL, "
+                + EVENT_TIME_FROM + " TEXT NOT NULL, "
+                + EVENT_TIME_TO + " TEXT NOT NULL, "
                 + PATIENT + " TEXT NOT NULL, "
                 + EVENT_STATUS + " TEXT NOT NULL, "
                 + COMMENT + " TEXT, "
@@ -121,8 +123,9 @@ const QStringList PATIENTS_HEADERS = {
 const QStringList EVENTS_TABLE_HEADERS = {
     "Код прийому",
     "Дата додавання події",
-    "Дата прийму",
-    "Час прийому",
+    "Дата",
+    "З",
+    "По",
     "Пацієнт",
     "Статус",
     "Примітка",
@@ -154,7 +157,8 @@ enum EventsCol{
     EVENT_ID_COL,
     EVENT_INIT_DATE_COL,
     EVENT_DATE_COL,
-    EVENT_TIME_COL,
+    EVENT_TIME_FROM_COL,
+    EVENT_TIME_TO_COL,
     PATIENT_COL,
     EVENT_STATUS_COL,
     COMMENT_COL,

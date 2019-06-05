@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>343</width>
-    <height>258</height>
+    <width>374</width>
+    <height>281</height>
    </rect>
   </property>
   <property name="font">
@@ -26,8 +26,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>164</x>
-     <y>220</y>
+     <x>195</x>
+     <y>240</y>
      <width>168</width>
      <height>27</height>
     </rect>
@@ -35,6 +35,9 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QPushButton" name="ok_pb">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>ОК</string>
       </property>
@@ -52,10 +55,10 @@
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>21</y>
-     <width>311</width>
-     <height>191</height>
+     <x>22</x>
+     <y>24</y>
+     <width>341</width>
+     <height>211</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -90,12 +93,12 @@
     <item row="2" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Час</string>
+       <string>Початок прийому</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QTimeEdit" name="time_te">
+     <widget class="QTimeEdit" name="time_from_te">
       <property name="displayFormat">
        <string>hh:mm</string>
       </property>
@@ -105,13 +108,30 @@
      </widget>
     </item>
     <item row="3" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Кінець прийому</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QTimeEdit" name="time_to_te">
+      <property name="displayFormat">
+       <string>hh:mm</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
      <widget class="QLabel" name="label_4">
       <property name="text">
        <string>Примітка</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="4" column="1">
      <widget class="QTextEdit" name="comment_te"/>
     </item>
    </layout>

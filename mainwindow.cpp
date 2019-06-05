@@ -31,7 +31,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     events_filter_model = new QSortFilterProxyModel(this);
     events_filter_model->setSourceModel(events_model);
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
-    events_filter_model->setFilterFixedString(QDate::currentDate().toString("yyyy-MM-dd"));
+    events_filter_model->setFilterFixedString(QDate::currentDate().toString(SQL_DATE_FORMAT));
     ui->events_table->setModel(events_filter_model);
 
     for (int col = 0; col < patients_model->columnCount(); ++col) {
@@ -41,7 +41,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
         }
     }
     for (int col = 0; col < events_model->columnCount(); ++col) {
-        if (!(col == EVENT_TIME_COL || col == PATIENT_COL || col == EVENT_STATUS_COL || col == COMMENT_COL)){
+        if (col == EVENT_ID_COL || col == INIT_DATE_COL || col == EVENT_PATIENT_ID_COL){
             ui->events_table->setColumnHidden(col, true);
         }
     }
@@ -49,15 +49,17 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     TableInit(ui->patients_table);
     TableInit(ui->events_table);
     ui->patients_table->setShowGrid(false);
-//    ui->events_table->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-    ui->events_table->setColumnWidth(PATIENT_COL,  250);
+    ui->events_table->setColumnWidth (EVENT_DATE_COL,70);
+    ui->events_table->setColumnWidth(EVENT_TIME_FROM_COL, 40);
+    ui->events_table->setColumnWidth(EVENT_TIME_TO_COL, 40);
+    ui->events_table->setColumnWidth(PATIENT_COL, 250);
 
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowEventsBySelectedPatient);
 
-    QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::ShowEventsInSelectedDate );
+    QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::ShowEventsBySelectedDate );
 
     Update(0);
 }
@@ -142,17 +144,18 @@ void MainWindow::onActionAddPatient() {
 
 void MainWindow::onActionAddEvent() {
     QVariantList row = patients_model->rowCount () ? sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount()) : QVariantList();
-    AddEventDialog* add_event = new AddEventDialog(row, this);
+    AddEventDialog* add_event = new AddEventDialog(sdb, &row, this);
     if(add_event->exec () == QDialog::Accepted){
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               add_event->GetDate (),
-                              add_event->GetTime (),
+                              add_event->GetTimeFrom (),
+                              add_event->GetTimeTo (),
                               add_event->GetPatient (),
                               STATUS_LIST[ACTIVE],
                               add_event->GetComment (),
                               add_event->GetPatientId ()
                             };
-        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
+        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
 
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (EVENTS_TABLE, columns),
                                     sdb->GenerateBindValues (columns),
@@ -162,7 +165,7 @@ void MainWindow::onActionAddEvent() {
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
-        ui->statusBar->showMessage (add_event->GetPatient () + " записано на прийом " + add_event->GetDate () + " о " + add_event->GetTime ());
+        ui->statusBar->showMessage (add_event->GetPatient () + " записано на прийом " + add_event->GetDate () + " о " + add_event->GetTimeFrom ());
     }
 }
 
@@ -210,7 +213,7 @@ void MainWindow::onActionVisitHistory() {
 
 }
 
-void MainWindow::ShowEventsInSelectedDate() {
+void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString(SQL_DATE_FORMAT));
 }
