@@ -22,7 +22,9 @@ AddEventDialog::AddEventDialog(DataBase *data_base, QVariantList *curr_row, QWid
     else {
         ui->time_to_te->setTime (ui->time_from_te->time ().addSecs (3600));
     }
-    ui->patient_le->setText ((row->at(SURNAME_COL).toString () + " " + row->at (NAME_COL).toString () + " " + row->at (F_NAME_COL).toString ()).simplified ());
+    if(row->size()) {
+        ui->patient_le->setText ((row->at(SURNAME_COL).toString () + " " + row->at (NAME_COL).toString () + " " + row->at (F_NAME_COL).toString ()).simplified ());
+    }
 
     QObject::connect (ui->patient_le, &QLineEdit::textChanged, this, &AddEventDialog::EnabledOkButton);
     QObject::connect (ui->time_from_te, &QTimeEdit::timeChanged, this, &AddEventDialog::CheckFreeTime);
@@ -51,7 +53,9 @@ void AddEventDialog::EnabledOkButton() {
 }
 
 void AddEventDialog::CheckFreeTime() {
-
+//    SELECT patient_id FROM
+//    (SELECT patient_id, event_time_from, event_time_to FROM events WHERE event_date = '2019-06-07')
+//    WHERE '17:00' BETWEEN event_time_from AND event_time_to
 }
 
 QString AddEventDialog::GetPatient() {
