@@ -48,11 +48,8 @@ public:
                          const QString& where,
                          const QString& equal);
 
-    QString Select(const QString &select,
-                   const QString& from,
-                   const QString& where,
-                   const QString& equal);
-
+    QString Select(const QString &select, const QString& from, const QString& where, const QString& equal);
+    QString SelectMultiEqual(const QString &select, const QString& from, const QString& where, const QString& equal);
     QVariantList SelectRow(const QString& select,
                            const QString& from,
                            const QString& where,

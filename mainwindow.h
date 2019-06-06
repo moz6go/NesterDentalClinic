@@ -25,7 +25,13 @@ class MainWindow : public QMainWindow {
     QAction* action_edit_patient;
     QAction* action_tooth_card;
     QAction* action_visit_history;
+
     QAction* action_add_event;
+    QAction* edit_event;
+    QAction* cancel_event;
+    QAction* action_all_active_events;
+
+    QAction* action_appointment;
 
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
@@ -38,6 +44,10 @@ private slots:
     void onActionToothCard();
     void onActionVisitHistory();
     void onActionAddEvent();
+    void onActionEditEvent();
+    void onActionCancelEvent();
+    void onActionAllEvents();
+    void onActionAppointment();
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);

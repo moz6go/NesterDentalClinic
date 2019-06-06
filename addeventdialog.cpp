@@ -22,6 +22,7 @@ AddEventDialog::AddEventDialog(DataBase *data_base, QVariantList *curr_row, QWid
     else {
         ui->time_to_te->setTime (ui->time_from_te->time ().addSecs (3600));
     }
+
     if(row->size()) {
         ui->patient_le->setText ((row->at(SURNAME_COL).toString () + " " + row->at (NAME_COL).toString () + " " + row->at (F_NAME_COL).toString ()).simplified ());
     }
@@ -29,11 +30,12 @@ AddEventDialog::AddEventDialog(DataBase *data_base, QVariantList *curr_row, QWid
     QObject::connect (ui->patient_le, &QLineEdit::textChanged, this, &AddEventDialog::EnabledOkButton);
     QObject::connect (ui->time_from_te, &QTimeEdit::timeChanged, this, &AddEventDialog::CheckFreeTime);
     QObject::connect (ui->time_to_te, &QTimeEdit::timeChanged, this, &AddEventDialog::CheckFreeTime);
+    QObject::connect (ui->date_de, &QDateEdit::dateChanged, this, &AddEventDialog::CheckFreeTime);
     QObject::connect (ui->date_de, &QDateEdit::dateChanged, this, &AddEventDialog::SetMinTimeFrom);
     QObject::connect (ui->time_from_te, &QTimeEdit::timeChanged, this, &AddEventDialog::SetTimeTo);
     QObject::connect (ui->ok_pb, &QPushButton::clicked, this, &QDialog::accept);
     QObject::connect (ui->cancel_pb, &QPushButton::clicked, this, &QDialog::reject);
-    EnabledOkButton();
+    CheckFreeTime();
 }
 
 void AddEventDialog::SetTimeTo(QTime time_from){
@@ -48,14 +50,28 @@ void AddEventDialog::SetMinTimeFrom() {
 }
 
 void AddEventDialog::EnabledOkButton() {
-    CheckFreeTime ();
-    ui->ok_pb->setEnabled (ui->patient_le->text ().size ());
+    ui->ok_pb->setEnabled (ui->patient_le->text ().size () && ui->warning_lbl->text ().isEmpty ());
 }
 
 void AddEventDialog::CheckFreeTime() {
-//    SELECT patient_id FROM
-//    (SELECT patient_id, event_time_from, event_time_to FROM events WHERE event_date = '2019-06-07')
-//    WHERE '17:00' BETWEEN event_time_from AND event_time_to
+    QString patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE, EVENT_DATE,
+                                             "'" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
+                                             "' AND (" + EVENT_TIME_FROM + " <= '" + ui->time_from_te->time ().toString (TIME_FORMAT) +
+                                             "' AND " + EVENT_TIME_TO + " > '" + ui->time_from_te->time ().toString (TIME_FORMAT) + "')");
+    if (patient.isEmpty ()){
+        patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE, EVENT_DATE,
+                                         "'" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
+                                         "' AND (" + EVENT_TIME_FROM + " < '" + ui->time_to_te->time ().toString (TIME_FORMAT) +
+                                         "' AND " + EVENT_TIME_TO + " > '" + ui->time_to_te->time ().toString (TIME_FORMAT) + "')");
+    }
+
+    if (patient.size ()){
+        ui->warning_lbl->setText ("Час зайнятий пацієнтом " + patient);
+    }
+    else {
+        ui->warning_lbl->setText (patient);
+    }
+    EnabledOkButton();
 }
 
 QString AddEventDialog::GetPatient() {

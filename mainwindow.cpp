@@ -75,10 +75,14 @@ void MainWindow::BuildToolBar() {
     action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
     action_edit_patient = toolbar->addAction(QPixmap(":/action_icons/edit_patient.png"), "Редагувати дані пацієнта", this, SLOT(onActionEditClient()));
     action_tooth_card = toolbar->addAction(QPixmap(":/action_icons/tooth_card.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionToothCard()));
-    action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionVisitHistory()));
+    action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути історію візитів пацієнта", this, SLOT(onActionVisitHistory()));
     toolbar->addSeparator ();
     action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
-
+    edit_event = toolbar->addAction(QPixmap(":/action_icons/edit_event.png"), "Змінити дані прийому", this, SLOT(onActionEditEvent()));
+    cancel_event = toolbar->addAction(QPixmap(":/action_icons/cancel_event.png"), "Скасувати прийом", this, SLOT(onActionCancelEvent()));
+    action_all_active_events = toolbar->addAction(QPixmap(":/action_icons/all_events.png"), "Переглянути майбутні прийоми", this, SLOT(onActionAllEvents()));
+    toolbar->addSeparator ();
+    action_appointment = toolbar->addAction(QPixmap(":/action_icons/appointment.png"), "Записати дані про прийом", this, SLOT(onActionAppointment()));
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
     addToolBar(Qt::TopToolBarArea, toolbar);
@@ -104,7 +108,7 @@ void MainWindow::TableInit(QTableView *table) {
 void MainWindow::Update(int row) {
     events_model->select();
     patients_model->select ();
-    patients_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
+    patients_filter_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
     action_edit_patient->setEnabled (patients_model->rowCount ());
     ShowPatientInfo();
@@ -139,33 +143,6 @@ void MainWindow::onActionAddPatient() {
         }
         Update(patients_filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано пацієнта " + add_patient->GetSurname () + " " + add_patient->GetName ().left (1) + "." + add_patient->GetFName().left(1) + ".");
-    }
-}
-
-void MainWindow::onActionAddEvent() {
-    QVariantList row = patients_model->rowCount () ? sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount()) : QVariantList();
-    AddEventDialog* add_event = new AddEventDialog(sdb, &row, this);
-    if(add_event->exec () == QDialog::Accepted){
-        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
-                              add_event->GetDate (),
-                              add_event->GetTimeFrom (),
-                              add_event->GetTimeTo (),
-                              add_event->GetPatient (),
-                              STATUS_LIST[ACTIVE],
-                              add_event->GetComment (),
-                              add_event->GetPatientId ()
-                            };
-        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
-
-        if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (EVENTS_TABLE, columns),
-                                    sdb->GenerateBindValues (columns),
-                                    data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось записати на прийом! Проблема з підключеням до бази даних");
-            ui->statusBar->showMessage ("Невдалось записати на прийом! Проблема з підключеням до бази даних");
-            return;
-        }
-        Update(ui->patients_table->currentIndex ().row ());
-        ui->statusBar->showMessage (add_event->GetPatient () + " записано на прийом " + add_event->GetDate () + " о " + add_event->GetTimeFrom ());
     }
 }
 
@@ -205,6 +182,50 @@ void MainWindow::onActionEditClient() {
     }
 }
 
+void MainWindow::onActionAddEvent() {
+    QVariantList row = patients_model->rowCount () ? sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount()) : QVariantList();
+    AddEventDialog* add_event = new AddEventDialog(sdb, &row, this);
+    if(add_event->exec () == QDialog::Accepted){
+        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              add_event->GetDate (),
+                              add_event->GetTimeFrom (),
+                              add_event->GetTimeTo (),
+                              add_event->GetPatient (),
+                              STATUS_LIST[ACTIVE],
+                              add_event->GetComment (),
+                              add_event->GetPatientId ()
+                            };
+        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
+
+        if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (EVENTS_TABLE, columns),
+                                    sdb->GenerateBindValues (columns),
+                                    data)) {
+            QMessageBox::critical (this, "Error!", "Невдалось записати на прийом! Проблема з підключеням до бази даних");
+            ui->statusBar->showMessage ("Невдалось записати на прийом! Проблема з підключеням до бази даних");
+            return;
+        }
+        Update(ui->patients_table->currentIndex ().row ());
+        ui->statusBar->showMessage (add_event->GetPatient () + " записано на прийом " + add_event->GetDate () + " о " + add_event->GetTimeFrom ());
+    }
+}
+
+void MainWindow::onActionEditEvent() {
+    qDebug () << "edit";
+}
+
+void MainWindow::onActionCancelEvent() {
+    qDebug () << "Cancel";
+}
+
+void MainWindow::onActionAllEvents() {
+    qDebug () << "AllEvents";
+}
+
+void MainWindow::onActionAppointment() {
+    qDebug () << "Appointment";
+}
+
+
 void MainWindow::onActionToothCard() {
 
 }
@@ -216,11 +237,14 @@ void MainWindow::onActionVisitHistory() {
 void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString(SQL_DATE_FORMAT));
+    events_filter_model->sort (EVENT_TIME_FROM_COL);
 }
 
 void MainWindow::ShowEventsBySelectedPatient() {
     events_filter_model->setFilterKeyColumn(EVENT_PATIENT_ID_COL);
     events_filter_model->setFilterFixedString(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ());
+    events_filter_model->sort (EVENT_TIME_FROM_COL);
+    events_filter_model->sort (EVENT_DATE_COL);
 }
 
 void MainWindow::ShowPatientInfo() {

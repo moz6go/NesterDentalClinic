@@ -150,12 +150,7 @@ int DataBase::SelectCount(const QString& from, const QString& where1, const QStr
 
 bool DataBase::DeleteRow(const QString &from, const QString &where, const QString &equal) {
     QSqlQuery query;
-    if (query.exec ("DELETE FROM " + from + " WHERE " + where + " = '" + equal + "'")){
-        return true;
-    }
-    else {
-        return false;
-    }
+    return query.exec ("DELETE FROM " + from + " WHERE " + where + " = '" + equal + "'");
 }
 
 QByteArray DataBase::SelectPic(const QString &from, const QString &where, const QString &equal) {
@@ -168,10 +163,18 @@ QByteArray DataBase::SelectPic(const QString &from, const QString &where, const 
 
 QString DataBase::Select(const QString &select, const QString &from, const QString &where, const QString &equal) {
     QSqlQuery query;
-    query.exec ("SELECT " + select + " FROM "+ from +" WHERE "+ where +" = '" + equal + "'");
+    query.exec ("SELECT " + select + " FROM " + from + " WHERE " + where + " = '" + equal + "'");
     QSqlRecord rec = query.record ();
     query.next ();
-    return  query.value(rec.indexOf(select)).toString ();
+    return  query.isValid () ? query.value(rec.indexOf(select)).toString () : QString();
+}
+
+QString DataBase::SelectMultiEqual(const QString &select, const QString &from, const QString &where, const QString &equal) {
+    QSqlQuery query;
+    query.exec ("SELECT " + select + " FROM " + from + " WHERE " + where + " = " + equal);
+    QSqlRecord rec = query.record ();
+    query.next ();
+    return  query.isValid () ? query.value(rec.indexOf(select)).toString () : QString();
 }
 
 QVariantList DataBase::SelectRow(const QString &select,
