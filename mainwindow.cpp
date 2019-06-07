@@ -112,6 +112,15 @@ void MainWindow::Update(int row) {
     ui->patients_table->selectRow (row);
     action_edit_patient->setEnabled (patients_model->rowCount ());
     ShowPatientInfo();
+    GetEventsDateList();
+}
+
+void MainWindow::GetEventsDateList() {
+    QList<QDate> list;
+    for (int r = 0; r < events_model->rowCount(); ++r) {
+        list.append(events_model->data(events_model->index(r, EVENT_DATE_COL)).toDate());
+    }
+    ui->calendar->SetDataList(list);
 }
 
 void MainWindow::onActionAddPatient() {

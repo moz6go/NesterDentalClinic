@@ -5,6 +5,7 @@
 #include "database.h"
 #include "addpatientdialog.h"
 #include "addeventdialog.h"
+#include "mycalendarwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -38,6 +39,7 @@ class MainWindow : public QMainWindow {
     void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
     void TableInit(QTableView* table);
     void Update(int row);
+    void GetEventsDateList();
 private slots:
     void onActionAddPatient();
     void onActionEditClient();

@@ -527,7 +527,7 @@ background-color: rgba(250,250,250,0.2);
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QCalendarWidget" name="calendar">
+       <widget class="MyCalendarWidget" name="calendar">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -592,6 +592,13 @@ background-color: rgba(250,250,250,0.2);
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyCalendarWidget</class>
+   <extends>QCalendarWidget</extends>
+   <header>mycalendarwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="res/res.qrc"/>
  </resources>

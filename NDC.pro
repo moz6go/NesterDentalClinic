@@ -16,13 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     database.cpp \
     addpatientdialog.cpp \
-    addeventdialog.cpp
+    addeventdialog.cpp \
+    mycalendarwidget.cpp
 
 HEADERS  += mainwindow.h \
     general.h \
     database.h \
     addpatientdialog.h \
-    addeventdialog.h
+    addeventdialog.h \
+    mycalendarwidget.h
 
 FORMS    += mainwindow.ui \
     addpatientdialog.ui \
