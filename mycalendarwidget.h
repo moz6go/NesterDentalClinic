@@ -10,7 +10,7 @@ class MyCalendarWidget : public QCalendarWidget
 {
     Q_OBJECT
     QDate curr_date;
-    QList<QDate> date_list;
+    QList<QDate> active_date_list;
 //    QPen blue_pen;
 //    QPen red_pen;
 //    QBrush brush;
@@ -19,7 +19,7 @@ protected:
 public:
     MyCalendarWidget(QWidget *parent = nullptr);
     ~MyCalendarWidget();
-    void SetDataList(const QList<QDate>& list);
+    void SetActiveDataList(const QList<QDate>& list);
 };
 
 #endif // MYCALENDARWIDGET_H

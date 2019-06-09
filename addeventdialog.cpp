@@ -64,15 +64,17 @@ void AddEventDialog::EnabledOkButton() {
 }
 
 void AddEventDialog::CheckFreeTime() {
-    QString patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE, EVENT_DATE,
-                                             "'" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
+    QString patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE,
+                                             EVENT_DATE + " = '" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
                                              "' AND (" + EVENT_TIME_FROM + " <= '" + ui->time_from_te->time ().toString (TIME_FORMAT) +
-                                             "' AND " + EVENT_TIME_TO + " > '" + ui->time_from_te->time ().toString (TIME_FORMAT) + "')");
+                                             "' AND " + EVENT_TIME_TO + " > '" + ui->time_from_te->time ().toString (TIME_FORMAT) + "')" +
+                                             " AND " + EVENT_STATUS + " = '" + STATUS_LIST[ACTIVE] + "'");
     if (patient.isEmpty ()){
-        patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE, EVENT_DATE,
-                                         "'" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
+        patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE,
+                                         EVENT_DATE + " = '" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
                                          "' AND (" + EVENT_TIME_FROM + " < '" + ui->time_to_te->time ().toString (TIME_FORMAT) +
-                                         "' AND " + EVENT_TIME_TO + " > '" + ui->time_to_te->time ().toString (TIME_FORMAT) + "')");
+                                         "' AND " + EVENT_TIME_TO + " > '" + ui->time_to_te->time ().toString (TIME_FORMAT) + "')" +
+                                         " AND " + EVENT_STATUS + " = '" + STATUS_LIST[ACTIVE] + "'");
     }
 
     if (patient.size ()){

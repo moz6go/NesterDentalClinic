@@ -169,9 +169,9 @@ QString DataBase::Select(const QString &select, const QString &from, const QStri
     return  query.isValid () ? query.value(rec.indexOf(select)).toString () : QString();
 }
 
-QString DataBase::SelectMultiEqual(const QString &select, const QString &from, const QString &where, const QString &equal) {
+QString DataBase::SelectMultiEqual(const QString &select, const QString &from, const QString &expresion) {
     QSqlQuery query;
-    query.exec ("SELECT " + select + " FROM " + from + " WHERE " + where + " = " + equal);
+    query.exec ("SELECT " + select + " FROM " + from + " WHERE " + expresion);
     QSqlRecord rec = query.record ();
     query.next ();
     return  query.isValid () ? query.value(rec.indexOf(select)).toString () : QString();

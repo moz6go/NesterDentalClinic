@@ -9,19 +9,24 @@ MyCalendarWidget::MyCalendarWidget(QWidget *parent) : QCalendarWidget (parent) {
 
 MyCalendarWidget::~MyCalendarWidget() {}
 
-void MyCalendarWidget::SetDataList(const QList<QDate> &list) {
-    date_list = list;
+void MyCalendarWidget::SetActiveDataList(const QList<QDate> &list) {
+    active_date_list = list;
 }
 
 void MyCalendarWidget::paintCell (QPainter *painter, const QRect &rect, const QDate &date) const
 {
     QCalendarWidget::paintCell(painter, rect, date);
-    if(date_list.contains (date)){
+    if(active_date_list.contains (date) && date < QDate::currentDate ()){
+        painter->setPen(QPen(Qt::gray, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+//        painter->setBrush(brush);
+        painter->drawRect(rect.adjusted (0, 0, -1, -1));
+    }
+    else if (active_date_list.contains (date) && date > QDate::currentDate ()) {
         painter->setPen(QPen(Qt::darkCyan, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 //        painter->setBrush(brush);
         painter->drawRect(rect.adjusted (0, 0, -1, -1));
     }
-    if (date == curr_date) {
+    else if (date == curr_date) {
         painter->setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 //        painter->setBrush(brush);
         painter->drawRect(rect.adjusted (0, 0, -1, -1));

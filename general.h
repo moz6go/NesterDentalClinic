@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
@@ -31,6 +32,7 @@
 #include <QSqlRecord>
 #include <QSqlTableModel>
 #include <QSortFilterProxyModel>
+#include <QIdentityProxyModel>
 #include <QSqlQueryModel>
 #include <QSqlError>
 #include <QSqlField>
@@ -133,7 +135,6 @@ const QStringList EVENTS_TABLE_HEADERS = {
 
 const QStringList STATUS_LIST = {
     "Активний",
-    "Протерміновано",
     "Скасовано",
     "Виконано"
 };
@@ -166,7 +167,6 @@ enum EventsCol{
 
 enum EventsStatus {
     ACTIVE,
-    OVERDUE,
     CANCELED,
     EXECUTED
 };
@@ -175,6 +175,7 @@ enum Role {
     ADD,
     EDIT
 };
+
 
 #endif // GENERAL
 

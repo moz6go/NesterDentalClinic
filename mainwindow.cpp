@@ -2,6 +2,22 @@
 #include "ui_mainwindow.h"
 
 
+MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
+{
+}
+
+QVariant MySortFilterProxyModel::data(const QModelIndex &index, int role) const
+{
+    if (role == Qt::TextColorRole) {
+        QColor color;
+        if (index.data ().toString () == STATUS_LIST[CANCELED]){
+            color = Qt::gray;
+        }
+        return QBrush(color);
+    }
+    return QSortFilterProxyModel::data(index, role);
+}
+
 MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -28,7 +44,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     events_model = new QSqlTableModel(this);
     events_model->setTable(EVENTS_TABLE);
     RenameHeaders(events_model->columnCount(), events_model, EVENTS_TABLE_HEADERS);
-    events_filter_model = new QSortFilterProxyModel(this);
+    events_filter_model = new MySortFilterProxyModel(this);
     events_filter_model->setSourceModel(events_model);
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(QDate::currentDate().toString(SQL_DATE_FORMAT));
@@ -54,13 +70,15 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     ui->events_table->setColumnWidth(EVENT_TIME_TO_COL, 40);
     ui->events_table->setColumnWidth(PATIENT_COL, 250);
 
+    QTimer* timer = new QTimer(this);
+    QObject::connect (timer, &QTimer::timeout, this, [=] { Update(patients_filter_model->rowCount ()); });
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowEventsBySelectedPatient);
 
     QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::ShowEventsBySelectedDate );
-
+    timer->start (60000);
     Update(0);
 }
 
@@ -106,14 +124,17 @@ void MainWindow::TableInit(QTableView *table) {
 }
 
 void MainWindow::Update(int row) {
+    QTime t = QTime::currentTime ();
     events_model->select();
     patients_model->select ();
     patients_filter_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
     ui->events_table->selectRow(0);
+    CancelEvents();
     UpdateButtons();
     ShowPatientInfo();
-    GetEventsDateList();
+    GetActiveEventsDateList();
+    qDebug() << t.elapsed ();
 }
 
 void MainWindow::UpdateButtons() {
@@ -123,13 +144,29 @@ void MainWindow::UpdateButtons() {
     action_all_active_events->setEnabled(events_model->rowCount());
 }
 
-void MainWindow::GetEventsDateList() {
+void MainWindow::GetActiveEventsDateList() {
     QList<QDate> list;
     for (int r = 0; r < events_model->rowCount(); ++r) {
         list.append(events_model->data(events_model->index(r, EVENT_DATE_COL)).toDate());
     }
-    ui->calendar->SetDataList(list);
+    ui->calendar->SetActiveDataList(list);
 }
+
+void MainWindow::CancelEvents() {
+    for (int row = 0; row < events_model->rowCount (); ++row) {
+        QString event_id = events_model->data(events_model->index (row, EVENT_ID_COL)).toString();
+        QDateTime event_date_time  = QDateTime(events_model->data(events_model->index (row, EVENT_DATE_COL)).toDate (), events_model->data(events_model->index (row, EVENT_TIME_TO_COL)).toTime ());
+        QString event_status = events_model->data(events_model->index (row, EVENT_STATUS_COL)).toString();
+        if ( event_date_time < QDateTime::currentDateTime () && event_status == STATUS_LIST[ACTIVE]){
+            QVariantList data = {  STATUS_LIST[CANCELED]};
+            QStringList columns = { EVENT_STATUS};
+            sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
+                                   sdb->GenerateBindValues (columns),
+                                   data);
+        }
+    }
+}
+
 
 void MainWindow::onActionAddPatient() {
     AddPatientDialog* add_patient = new AddPatientDialog (QVariantList(), this);
@@ -250,7 +287,31 @@ void MainWindow::onActionEditEvent() {
 }
 
 void MainWindow::onActionCancelEvent() {
-    qDebug () << "Cancel";
+    QString event_id = events_filter_model->data (events_filter_model->index (ui->events_table->currentIndex().row(), EVENT_ID_COL)).toString ();
+    QString patient = events_filter_model->data (events_filter_model->index (ui->events_table->currentIndex().row(), PATIENT_COL)).toString ();
+    QMessageBox msgbox(QMessageBox::Question,
+                       "Скасування прийому",
+                       "Ви дійсно бажаєте скасувати прийом " + patient,
+                       QMessageBox::Yes | QMessageBox::No,
+                       this);
+    msgbox.setButtonText (QMessageBox::Yes, tr("Так"));
+    msgbox.setButtonText (QMessageBox::No, tr("Ніт"));
+
+    if(msgbox.exec () == QMessageBox::Yes){
+        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              STATUS_LIST[CANCELED]
+                            };
+        QStringList columns = { EVENT_INIT_DATE, EVENT_STATUS};
+
+        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
+                                    sdb->GenerateBindValues (columns),
+                                    data)) {
+            ui->statusBar->showMessage ("Невдалось скасувати прийом! Проблема з підключеням до бази даних");
+            return;
+        }
+        Update(ui->patients_table->currentIndex ().row ());
+        ui->statusBar->showMessage ("Прийом пацієнта " + patient + " скасовано!");
+    }
 }
 
 void MainWindow::onActionAllEvents() {
@@ -323,4 +384,5 @@ void MainWindow::SearchTextChanged(QString text) {
 MainWindow::~MainWindow() {
     delete ui;
 }
+
 

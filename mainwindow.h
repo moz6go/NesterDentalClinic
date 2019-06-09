@@ -11,6 +11,13 @@ namespace Ui {
 class MainWindow;
 }
 
+class MySortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    MySortFilterProxyModel(QObject* parent = nullptr);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+};
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
     Ui::MainWindow *ui;
@@ -18,7 +25,7 @@ class MainWindow : public QMainWindow {
     QSqlTableModel* patients_model;
     QSqlTableModel* events_model;
     QSortFilterProxyModel* patients_filter_model;
-    QSortFilterProxyModel* events_filter_model;
+    MySortFilterProxyModel* events_filter_model;
     QToolBar* toolbar;
     QPixmap patient_photo;
 
@@ -40,7 +47,8 @@ class MainWindow : public QMainWindow {
     void TableInit(QTableView* table);
     void Update(int row);
     void UpdateButtons();
-    void GetEventsDateList();
+    void GetActiveEventsDateList();
+    void CancelEvents();
 private slots:
     void onActionAddPatient();
     void onActionEditClient();
