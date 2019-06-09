@@ -171,5 +171,10 @@ enum EventsStatus {
     EXECUTED
 };
 
+enum Role {
+    ADD,
+    EDIT
+};
+
 #endif // GENERAL
 

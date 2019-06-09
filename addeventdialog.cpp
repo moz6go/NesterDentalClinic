@@ -2,7 +2,7 @@
 #include "ui_addeventdialog.h"
 
 
-AddEventDialog::AddEventDialog(DataBase *data_base, QVariantList *curr_row, QWidget *parent) :
+AddEventDialog::AddEventDialog(DataBase* data_base, QVariantList* curr_row, Role role, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddEventDialog)
 {
@@ -10,21 +10,30 @@ AddEventDialog::AddEventDialog(DataBase *data_base, QVariantList *curr_row, QWid
     sdb = data_base;
     row = curr_row;
     ui->date_de->setMinimumDate (QDate::currentDate ());
-    ui->date_de->setDate (QDate::currentDate ());
 
-    ui->time_from_te->setMinimumTime (QTime::currentTime ());
-    ui->time_from_te->setTime (QTime(QTime::currentTime ().hour () + 1, 0));
+    if (role == ADD){
+        ui->time_from_te->setMinimumTime (QTime::currentTime ());
+        ui->time_to_te->setMinimumTime(QTime::currentTime());
 
-    ui->time_to_te->setMaximumTime (QTime(23,59));
-    if(ui->time_from_te->time ().addSecs (3600) < ui->time_from_te->time ()) {
-        ui->time_to_te->setTime (QTime(23,59));
+        if(row->size()) {
+            ui->patient_le->setText ((row->at(SURNAME_COL).toString () + " " + row->at (NAME_COL).toString () + " " + row->at (F_NAME_COL).toString ()).simplified ());
+        }
+        ui->date_de->setDate (QDate::currentDate ());
+        ui->time_from_te->setTime (QTime(QTime::currentTime ().hour () + 1, 0));
+        ui->time_to_te->setMaximumTime (QTime(23,59));
+        if(ui->time_from_te->time ().addSecs (3600) < ui->time_from_te->time ()) {
+            ui->time_to_te->setTime (QTime(23,59));
+        }
+        else {
+            ui->time_to_te->setTime (ui->time_from_te->time ().addSecs (3600));
+        }
     }
     else {
-        ui->time_to_te->setTime (ui->time_from_te->time ().addSecs (3600));
-    }
-
-    if(row->size()) {
-        ui->patient_le->setText ((row->at(SURNAME_COL).toString () + " " + row->at (NAME_COL).toString () + " " + row->at (F_NAME_COL).toString ()).simplified ());
+        ui->patient_le->setText(row->at(PATIENT_COL).toString());
+        ui->patient_le->setDisabled(true);
+        ui->date_de->setDate(row->at(EVENT_DATE_COL).toDate());
+        ui->time_from_te->setTime(row->at(EVENT_TIME_FROM_COL).toTime());
+        ui->time_to_te->setTime(row->at(EVENT_TIME_TO_COL).toTime());
     }
 
     QObject::connect (ui->patient_le, &QLineEdit::textChanged, this, &AddEventDialog::EnabledOkButton);
@@ -46,6 +55,7 @@ void AddEventDialog::SetTimeTo(QTime time_from){
 void AddEventDialog::SetMinTimeFrom() {
     if (ui->date_de->date() > QDate::currentDate ()){
          ui->time_from_te->setMinimumTime(QTime(0, 0));
+         ui->time_to_te->setMinimumTime(QTime(0, 0));
     }
 }
 

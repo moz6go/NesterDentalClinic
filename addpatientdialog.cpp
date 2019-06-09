@@ -13,17 +13,17 @@ AddPatientDialog::AddPatientDialog(const QVariantList& row, QWidget *parent) :
     ui->tel_number_le->setInputMask ("38 (000) 000 00 00;_");
 
     if (!row.isEmpty ()){
-        ui->s_name_le->setText (row.at (2).toString ());
-        ui->name_le->setText (row.at (3).toString ());
-        ui->f_name_le->setText (row.at (4).toString ());
-        ui->b_date_de->setDate (row.at (5).toDate ());
-        ui->sex_cb->setCurrentText (row.at (6).toString ());
-        ui->city_le->setText (row.at (7).toString ());
-        ui->tel_number_le->setText (row.at (8).toString ());
-        ui->illnesses_te->setText(row.at(9).toString());
+        ui->s_name_le->setText (row.at (SURNAME_COL).toString ());
+        ui->name_le->setText (row.at (NAME_COL).toString ());
+        ui->f_name_le->setText (row.at (F_NAME_COL).toString ());
+        ui->b_date_de->setDate (row.at (B_DATE_COL).toDate ());
+        ui->sex_cb->setCurrentText (row.at (SEX_COL).toString ());
+        ui->city_le->setText (row.at (CITY_COL).toString ());
+        ui->tel_number_le->setText (row.at (TEL_NUMBER_COL).toString ());
+        ui->illnesses_te->setText(row.at(ILLNESSES_COL).toString());
 
         QPixmap photo;
-        photo.loadFromData (row.at (10).toByteArray ());
+        photo.loadFromData (row.at (PATIENT_PHOTO_COL).toByteArray ());
         if (!photo.isNull ()){
             ui->patient_photo_lbl->setPixmap(photo.scaledToWidth (ui->patient_photo_lbl->width ()));
         }

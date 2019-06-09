@@ -28,8 +28,8 @@ class MainWindow : public QMainWindow {
     QAction* action_visit_history;
 
     QAction* action_add_event;
-    QAction* edit_event;
-    QAction* cancel_event;
+    QAction* action_edit_event;
+    QAction* action_cancel_event;
     QAction* action_all_active_events;
 
     QAction* action_appointment;
@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow {
     void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
     void TableInit(QTableView* table);
     void Update(int row);
+    void UpdateButtons();
     void GetEventsDateList();
 private slots:
     void onActionAddPatient();

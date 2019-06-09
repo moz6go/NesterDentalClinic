@@ -21,7 +21,7 @@ private slots:
     void EnabledOkButton();
     void CheckFreeTime();
 public:
-    explicit AddEventDialog(DataBase* data_base, QVariantList* curr_row, QWidget *parent = nullptr);
+    explicit AddEventDialog(DataBase* data_base, QVariantList* curr_row, Role role = ADD, QWidget *parent = nullptr);
     QString GetPatient();
     QString GetDate();
     QString GetTimeFrom();

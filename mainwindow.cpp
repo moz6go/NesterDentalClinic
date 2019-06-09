@@ -78,8 +78,8 @@ void MainWindow::BuildToolBar() {
     action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути історію візитів пацієнта", this, SLOT(onActionVisitHistory()));
     toolbar->addSeparator ();
     action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
-    edit_event = toolbar->addAction(QPixmap(":/action_icons/edit_event.png"), "Змінити дані прийому", this, SLOT(onActionEditEvent()));
-    cancel_event = toolbar->addAction(QPixmap(":/action_icons/cancel_event.png"), "Скасувати прийом", this, SLOT(onActionCancelEvent()));
+    action_edit_event = toolbar->addAction(QPixmap(":/action_icons/edit_event.png"), "Змінити дані прийому", this, SLOT(onActionEditEvent()));
+    action_cancel_event = toolbar->addAction(QPixmap(":/action_icons/cancel_event.png"), "Скасувати прийом", this, SLOT(onActionCancelEvent()));
     action_all_active_events = toolbar->addAction(QPixmap(":/action_icons/all_events.png"), "Переглянути майбутні прийоми", this, SLOT(onActionAllEvents()));
     toolbar->addSeparator ();
     action_appointment = toolbar->addAction(QPixmap(":/action_icons/appointment.png"), "Записати дані про прийом", this, SLOT(onActionAppointment()));
@@ -110,9 +110,17 @@ void MainWindow::Update(int row) {
     patients_model->select ();
     patients_filter_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
     ui->patients_table->selectRow (row);
-    action_edit_patient->setEnabled (patients_model->rowCount ());
+    ui->events_table->selectRow(0);
+    UpdateButtons();
     ShowPatientInfo();
     GetEventsDateList();
+}
+
+void MainWindow::UpdateButtons() {
+    action_edit_patient->setEnabled (patients_model->rowCount ());
+    action_edit_event->setEnabled(events_filter_model->rowCount());
+    action_cancel_event->setEnabled(events_filter_model->rowCount());
+    action_all_active_events->setEnabled(events_model->rowCount());
 }
 
 void MainWindow::GetEventsDateList() {
@@ -180,7 +188,7 @@ void MainWindow::onActionEditClient() {
             columns.append (PATIENT_PHOTO);
         }
 
-        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (PATIENTS_TABLE, columns, PATIENT_ID, row.at(0).toString ()),
+        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (PATIENTS_TABLE, columns, PATIENT_ID, row.at(PATIENT_ID_COL).toString ()),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
             ui->statusBar->showMessage ("Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
@@ -193,7 +201,7 @@ void MainWindow::onActionEditClient() {
 
 void MainWindow::onActionAddEvent() {
     QVariantList row = patients_model->rowCount () ? sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount()) : QVariantList();
-    AddEventDialog* add_event = new AddEventDialog(sdb, &row, this);
+    AddEventDialog* add_event = new AddEventDialog(sdb, &row, ADD, this);
     if(add_event->exec () == QDialog::Accepted){
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               add_event->GetDate (),
@@ -219,7 +227,26 @@ void MainWindow::onActionAddEvent() {
 }
 
 void MainWindow::onActionEditEvent() {
-    qDebug () << "edit";
+    QVariantList row = events_filter_model->rowCount() ? sdb->SelectRow("*", EVENTS_TABLE, EVENT_ID, events_filter_model->data(events_filter_model->index(ui->events_table->currentIndex().row(), EVENT_ID_COL)).toString(), events_model->columnCount()):QVariantList();
+    AddEventDialog* edit_event = new AddEventDialog(sdb, &row, EDIT, this);
+    if(edit_event->exec() == QDialog::Accepted){
+        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              edit_event->GetDate(),
+                              edit_event->GetTimeFrom(),
+                              edit_event->GetTimeTo(),
+                              edit_event->GetComment()
+                            };
+        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, COMMENT};
+
+        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, row.at(EVENT_ID_COL).toString ()),
+                                    sdb->GenerateBindValues (columns),
+                                    data)) {
+            ui->statusBar->showMessage ("Невдалось відредагувати дані прийому! Проблема з підключеням до бази даних");
+            return;
+        }
+        Update(ui->patients_table->currentIndex ().row ());
+        ui->statusBar->showMessage ("Відредаговано дані прийому пацієнта " + row.at(PATIENT_COL).toString());
+    }
 }
 
 void MainWindow::onActionCancelEvent() {
@@ -247,6 +274,7 @@ void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString(SQL_DATE_FORMAT));
     events_filter_model->sort (EVENT_TIME_FROM_COL);
+    Update(ui->patients_table->currentIndex().row());
 }
 
 void MainWindow::ShowEventsBySelectedPatient() {
@@ -254,6 +282,7 @@ void MainWindow::ShowEventsBySelectedPatient() {
     events_filter_model->setFilterFixedString(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ());
     events_filter_model->sort (EVENT_TIME_FROM_COL);
     events_filter_model->sort (EVENT_DATE_COL);
+    Update(ui->patients_table->currentIndex().row());
 }
 
 void MainWindow::ShowPatientInfo() {
