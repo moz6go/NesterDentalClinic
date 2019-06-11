@@ -17,18 +17,23 @@ SOURCES += main.cpp\
     database.cpp \
     addpatientdialog.cpp \
     addeventdialog.cpp \
-    mycalendarwidget.cpp
+    mycalendarwidget.cpp \
+    alleventsdialog.cpp \
+    mysortfilterproxymodel.cpp
 
 HEADERS  += mainwindow.h \
     general.h \
     database.h \
     addpatientdialog.h \
     addeventdialog.h \
-    mycalendarwidget.h
+    mycalendarwidget.h \
+    alleventsdialog.h \
+    mysortfilterproxymodel.h
 
 FORMS    += mainwindow.ui \
     addpatientdialog.ui \
-    addeventdialog.ui
+    addeventdialog.ui \
+    alleventsdialog.ui
 
 RESOURCES += \
     res/res.qrc

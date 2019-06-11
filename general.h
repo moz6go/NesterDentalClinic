@@ -2,10 +2,11 @@
 #define GENERAL
 
 #include <QApplication>
+#include <QObject>
 #include <QMainWindow>
+#include <QDialog>
 #include <QtDebug>
 #include <QDebug>
-#include <QObject>
 #include <QToolBar>
 #include <QLabel>
 #include <QLineEdit>
@@ -20,11 +21,14 @@
 #include <QComboBox>
 #include <QFileDialog>
 #include <QDate>
+#include <QTimer>
 #include <QBuffer>
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QStandardPaths>
-#include <QTimer>
+#include <QPen>
+#include <QPainter>
+#include <QCalendarWidget>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>

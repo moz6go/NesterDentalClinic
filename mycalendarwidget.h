@@ -1,11 +1,7 @@
 #ifndef MYCALENDARWIDGET_H
 #define MYCALENDARWIDGET_H
 
-#include <QObject>
-#include <QPen>
-#include <QPainter>
-#include <QCalendarWidget>
-
+#include "general.h"
 class MyCalendarWidget : public QCalendarWidget
 {
     Q_OBJECT

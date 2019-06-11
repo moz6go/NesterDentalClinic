@@ -2,23 +2,7 @@
 #include "ui_mainwindow.h"
 
 
-MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
-{
-}
 
-QVariant MySortFilterProxyModel::data(const QModelIndex &index, int role) const
-{
-    if (role == Qt::TextColorRole) {
-        QColor color;
-        if(this->data(this->index(index.row(), EVENT_STATUS_COL)).toString() == STATUS_LIST[CANCELED]) {
-            color = Qt::darkGray;
-        }
-        return QBrush(color);
-    }
-    return QSortFilterProxyModel::data(index, role);
-}
-
-//--------------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -72,7 +56,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     ui->events_table->setColumnWidth(PATIENT_COL, 250);
 
     QTimer* timer = new QTimer(this);
-    QObject::connect (timer, &QTimer::timeout, this, [=] { Update(patients_filter_model->rowCount ()); });
+    QObject::connect (timer, &QTimer::timeout, this, [=] { Update(ui->patients_table->currentIndex ().row ()); });
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
@@ -296,9 +280,9 @@ void MainWindow::onActionCancelEvent() {
     QString event_id = events_filter_model->data (events_filter_model->index (ui->events_table->currentIndex().row(), EVENT_ID_COL)).toString ();
     QString patient = events_filter_model->data (events_filter_model->index (ui->events_table->currentIndex().row(), PATIENT_COL)).toString ();
     if(event_id.isEmpty()) {
-        QMessageBox::information(this, "Видалення прийому", "Виберіть прийом, який хочете видалити");
+        QMessageBox::information(this, "Скасування прийому", "Виберіть прийом, який бажаєте скасувати");
     }
-    else{
+    else {
         QMessageBox msgbox(QMessageBox::Question,
                            "Скасування прийому",
                            "Ви дійсно бажаєте скасувати прийом " + patient,
@@ -326,7 +310,8 @@ void MainWindow::onActionCancelEvent() {
 }
 
 void MainWindow::onActionAllEvents() {
-    qDebug () << "AllEvents";
+    AllEventsDialog* all_events = new AllEventsDialog(sdb, this);
+    all_events->exec ();
 }
 
 void MainWindow::onActionAppointment() {

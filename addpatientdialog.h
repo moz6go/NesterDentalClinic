@@ -1,7 +1,6 @@
 #ifndef ADDPATIENTDIALOG_H
 #define ADDPATIENTDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

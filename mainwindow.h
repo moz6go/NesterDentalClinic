@@ -6,20 +6,18 @@
 #include "addpatientdialog.h"
 #include "addeventdialog.h"
 #include "mycalendarwidget.h"
+#include "alleventsdialog.h"
+#include "mysortfilterproxymodel.h"
 
+class AllEventsDialog;
 namespace Ui {
 class MainWindow;
 }
 
-class MySortFilterProxyModel : public QSortFilterProxyModel
-{
-public:
-    MySortFilterProxyModel(QObject* parent = nullptr);
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-};
-
 class MainWindow : public QMainWindow {
     Q_OBJECT
+    friend AllEventsDialog;
+
     Ui::MainWindow *ui;
     DataBase* sdb;
     QSqlTableModel* patients_model;
@@ -43,8 +41,8 @@ class MainWindow : public QMainWindow {
 
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
-    void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
-    void TableInit(QTableView* table);
+    static void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
+    static void TableInit(QTableView* table);
     void Update(int row);
     void UpdateButtons();
     void GetActiveEventsDateList();

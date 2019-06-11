@@ -1,7 +1,6 @@
 #ifndef ADDEVENTDIALOG_H
 #define ADDEVENTDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 
