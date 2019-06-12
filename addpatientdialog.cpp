@@ -27,6 +27,12 @@ AddPatientDialog::AddPatientDialog(const QVariantList& row, QWidget *parent) :
         if (!photo.isNull ()){
             ui->patient_photo_lbl->setPixmap(photo.scaledToWidth (ui->patient_photo_lbl->width ()));
         }
+        else if (row.at (SEX_COL).toString () == "Чоловіча") {
+            ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user.png"));
+        }
+        else {
+            ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user_female.png"));
+        }
 
         setWindowTitle ("Редагувати картку клієнта");
         EnableAddButton();

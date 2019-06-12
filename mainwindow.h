@@ -2,15 +2,17 @@
 #define MAINWINDOW_H
 
 #include "general.h"
-#include "database.h"
+
 #include "addpatientdialog.h"
 #include "addeventdialog.h"
 #include "mycalendarwidget.h"
 #include "alleventsdialog.h"
 #include "mysortfilterproxymodel.h"
 #include "appointmentdialog.h"
+#include "bindeventdialog.h"
 
 class AllEventsDialog;
+class BindEventDialog;
 namespace Ui {
 class MainWindow;
 }
@@ -18,6 +20,7 @@ class MainWindow;
 class MainWindow : public QMainWindow {
     Q_OBJECT
     friend AllEventsDialog;
+    friend BindEventDialog;
 
     Ui::MainWindow *ui;
     DataBase* sdb;
@@ -37,6 +40,7 @@ class MainWindow : public QMainWindow {
     QAction* action_edit_event;
     QAction* action_cancel_event;
     QAction* action_all_active_events;
+    QAction* action_bind_event;
 
     QAction* action_appointment;
 
@@ -57,6 +61,7 @@ private slots:
     void onActionEditEvent();
     void onActionCancelEvent();
     void onActionAllEvents();
+    void onActionBindEvent();
     void onActionAppointment();
     void ShowPatientInfo();
     void SetSearchType(QString type);

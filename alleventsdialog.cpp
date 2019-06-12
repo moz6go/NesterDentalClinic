@@ -2,7 +2,6 @@
 #include "ui_alleventsdialog.h"
 #include "mainwindow.h"
 
-
 AllEventsDialog::AllEventsDialog(DataBase *data_base, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AllEventsDialog)
@@ -35,7 +34,7 @@ AllEventsDialog::AllEventsDialog(DataBase *data_base, QWidget *parent) :
     }
 
     MainWindow::TableInit (ui->events_table);
-    ui->events_table->setColumnWidth (EVENT_DATE_COL,70);
+    ui->events_table->setColumnWidth (EVENT_DATE_COL, 80);
     ui->events_table->setColumnWidth(EVENT_TIME_FROM_COL, 40);
     ui->events_table->setColumnWidth(EVENT_TIME_TO_COL, 40);
     ui->events_table->setColumnWidth(PATIENT_COL, 250);

@@ -148,7 +148,13 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="events_table"/>
+    <widget class="QTableView" name="events_table">
+     <property name="font">
+      <font>
+       <family>Comic Sans MS</family>
+      </font>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -2,6 +2,7 @@
 #define MYCALENDARWIDGET_H
 
 #include "general.h"
+
 class MyCalendarWidget : public QCalendarWidget
 {
     Q_OBJECT

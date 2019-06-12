@@ -2,8 +2,8 @@
 #define ALLEVENTSDIALOG_H
 
 #include "general.h"
-#include "mysortfilterproxymodel.h"
 #include "database.h"
+#include "mysortfilterproxymodel.h"
 
 namespace Ui {
 class AllEventsDialog;

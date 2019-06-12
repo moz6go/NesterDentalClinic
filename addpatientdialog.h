@@ -2,7 +2,6 @@
 #define ADDPATIENTDIALOG_H
 
 #include "general.h"
-#include "database.h"
 
 namespace Ui {
 class AddPatientDialog;

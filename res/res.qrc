@@ -11,5 +11,7 @@
         <file>action_icons/cancel_event.png</file>
         <file>action_icons/edit_event.png</file>
         <file>action_icons/appointment.png</file>
+        <file>action_icons/bind_event.png</file>
+        <file>action_icons/default_user_female.png</file>
     </qresource>
 </RCC>

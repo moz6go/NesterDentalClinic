@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     addeventdialog.cpp \
     mycalendarwidget.cpp \
     alleventsdialog.cpp \
-    mysortfilterproxymodel.cpp
+    mysortfilterproxymodel.cpp \
+    bindeventdialog.cpp
 
 HEADERS  += mainwindow.h \
     appointmentdialog.h \
@@ -30,13 +31,15 @@ HEADERS  += mainwindow.h \
     addeventdialog.h \
     mycalendarwidget.h \
     alleventsdialog.h \
-    mysortfilterproxymodel.h
+    mysortfilterproxymodel.h \
+    bindeventdialog.h
 
 FORMS    += mainwindow.ui \
     addpatientdialog.ui \
     addeventdialog.ui \
     alleventsdialog.ui \
-    appointmentdialog.ui
+    appointmentdialog.ui \
+    bindeventdialog.ui
 
 RESOURCES += \
     res/res.qrc
