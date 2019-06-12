@@ -13,6 +13,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+    appointmentdialog.cpp \
         mainwindow.cpp \
     database.cpp \
     addpatientdialog.cpp \
@@ -22,6 +23,7 @@ SOURCES += main.cpp\
     mysortfilterproxymodel.cpp
 
 HEADERS  += mainwindow.h \
+    appointmentdialog.h \
     general.h \
     database.h \
     addpatientdialog.h \
@@ -33,7 +35,8 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     addpatientdialog.ui \
     addeventdialog.ui \
-    alleventsdialog.ui
+    alleventsdialog.ui \
+    appointmentdialog.ui
 
 RESOURCES += \
     res/res.qrc

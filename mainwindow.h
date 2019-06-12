@@ -8,6 +8,7 @@
 #include "mycalendarwidget.h"
 #include "alleventsdialog.h"
 #include "mysortfilterproxymodel.h"
+#include "appointmentdialog.h"
 
 class AllEventsDialog;
 namespace Ui {

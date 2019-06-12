@@ -86,6 +86,12 @@ const QString PATIENT = "patient";
 const QString EVENT_STATUS = "event_status";
 const QString COMMENT = "comment";
 
+const QString VISIT_ID = "visit_id";
+const QString VISIT_INIT_DATE = "visit_init_date";
+const QString PRICE = "price";
+const QString VISIT_RESULT = "visit_result";
+
+
 // create queries
 const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
               + PATIENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
@@ -111,6 +117,14 @@ const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
                 + COMMENT + " TEXT, "
                 + PATIENT_ID + " INTEGER)";
 
+const QString CREATE_VISITS_TABLE =  "CREATE TABLE " + VISITS_TABLE + " ("
+                + VISIT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+                + VISIT_INIT_DATE + " TEXT NOT NULL, "
+                + PATIENT + " TEXT NOT NULL, "
+                + PRICE + " REAL NOT NULL, "
+                + VISIT_RESULT + " TEXT NOT NULL, "
+                + EVENT_ID + " INTEGER)";
+
 const QStringList PATIENTS_HEADERS = {
     "Код пацієта",
     "Дата заведення картки",
@@ -126,7 +140,7 @@ const QStringList PATIENTS_HEADERS = {
 };
 
 const QStringList EVENTS_TABLE_HEADERS = {
-    "Код прийому",
+    "Код події",
     "Дата додавання події",
     "Дата",
     "З",
@@ -141,6 +155,15 @@ const QStringList STATUS_LIST = {
     "Активний",
     "Скасовано",
     "Виконано"
+};
+
+const QStringList VISITS_TABLE_HEADERS = {
+    "Код візиту",
+    "Дата візиту",
+    "Пацієнт",
+    "Вартість послуг, грн",
+    "Результат огляду/лікування",
+    "Код події"
 };
 
 enum PatientsCol {
@@ -173,6 +196,15 @@ enum EventsStatus {
     ACTIVE,
     CANCELED,
     EXECUTED
+};
+
+enum VisitsCol{
+    VISIT_ID_COL,
+    VISIT_INIT_DATE_COL,
+    VISIT_PATIENT_COL,
+    PRICE_COL,
+    VISIT_RESULT_COL,
+    VISIT_EVENT_ID_COL,
 };
 
 enum Role {

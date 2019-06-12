@@ -315,7 +315,17 @@ void MainWindow::onActionAllEvents() {
 }
 
 void MainWindow::onActionAppointment() {
-    qDebug () << "Appointment";
+    QString event_id = events_filter_model->data(events_filter_model->index(ui->events_table->currentIndex().row(), EVENT_ID_COL)).toString();
+    if(event_id.isEmpty()) {
+        QMessageBox::information(this, "Записати дані про прийом", "Виберіть з переліку прийом!");
+    }
+    else {
+        QVariantList row = events_filter_model->rowCount() ? sdb->SelectRow("*", EVENTS_TABLE, EVENT_ID, event_id, events_model->columnCount()) : QVariantList();
+        AppointmentDialog* appointment = new AppointmentDialog(sdb, &row, this);
+        if(appointment->exec() == QDialog::Accepted){
+
+        }
+    }
 }
 
 
@@ -380,5 +390,3 @@ void MainWindow::SearchTextChanged(QString text) {
 MainWindow::~MainWindow() {
     delete ui;
 }
-
-

@@ -16,7 +16,12 @@ class AllEventsDialog : public QDialog
     DataBase* sdb;
     QSqlTableModel* events_model;
     MySortFilterProxyModel* events_filter_model;
-
+private slots:
+    void SetSearchType(QString type);
+    void SearchTextChanged(QString text);
+    void SearchDateChanged(QDate date);
+    void SearchTimeChanged(QTime time);
+    void SearchStatusChanged(QString text);
 public:
     explicit AllEventsDialog(DataBase* data_base, QWidget *parent = nullptr);
     ~AllEventsDialog();
