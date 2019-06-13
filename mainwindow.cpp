@@ -356,9 +356,13 @@ void MainWindow::onActionBindEvent() {
 void MainWindow::onActionAppointment() {
     QString event_id = events_filter_model->data(events_filter_model->index(ui->events_table->currentIndex().row(), EVENT_ID_COL)).toString();
     QString patient_id = events_filter_model->data(events_filter_model->index(ui->events_table->currentIndex().row(), EVENT_PATIENT_ID_COL)).toString();
-
+    QString event_status = events_filter_model->data(events_filter_model->index(ui->events_table->currentIndex().row(), EVENT_STATUS_COL)).toString();
     if(event_id.isEmpty()) {
         QMessageBox::information(this, "Записати дані про прийом", "Виберіть з переліку прийом!");
+        return;
+    }
+    if (event_status == STATUS_LIST[EXECUTED]){
+        QMessageBox::information(this, "Записати дані про прийом", "Цей прийом вже відбувся!");
         return;
     }
     if(patient_id.isEmpty ()){

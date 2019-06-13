@@ -7,7 +7,7 @@ class MySortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
     MySortFilterProxyModel(QObject* parent = nullptr);
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const;
 };
 
 #endif // MYSORTFILTERPROXYMODEL_H

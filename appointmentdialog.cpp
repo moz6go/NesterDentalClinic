@@ -1,6 +1,7 @@
 #include "appointmentdialog.h"
 #include "ui_appointmentdialog.h"
 
+
 AppointmentDialog::AppointmentDialog(DataBase *data_base, QVariantList *curr_row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AppointmentDialog)
@@ -11,7 +12,7 @@ AppointmentDialog::AppointmentDialog(DataBase *data_base, QVariantList *curr_row
     if(row->size()) {
         ui->patient_le->setText (row->at(PATIENT_COL).toString ());
     }
-
+    QObject::connect(ui->results_te, &QTextEdit::textChanged, this, &AppointmentDialog::EnabledOkButton);
     QObject::connect(ui->ok_pb, &QPushButton::clicked, this, &AppointmentDialog::accept);
     QObject::connect(ui->cancel_pb, &QPushButton::clicked, this, &AppointmentDialog::reject);
 }
@@ -22,6 +23,10 @@ double AppointmentDialog::GetPrice() {
 
 QString AppointmentDialog::GetResults() {
     return ui->results_te->toPlainText();
+}
+
+void AppointmentDialog::EnabledOkButton(){
+    ui->ok_pb->setEnabled(ui->results_te->toPlainText().size());
 }
 
 AppointmentDialog::~AppointmentDialog() {

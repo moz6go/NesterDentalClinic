@@ -37,17 +37,17 @@ BindEventDialog::BindEventDialog(DataBase *data_base, QWidget *parent) :
 
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &BindEventDialog::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &BindEventDialog::SearchTextChanged);
-
+    QObject::connect(ui->patients_table, &QTableView::clicked, this, &BindEventDialog::EnabledOkButton);
     QObject::connect (ui->ok_pb, &QPushButton::clicked, this, &QDialog::accept);
     QObject::connect (ui->cancel_pb, &QPushButton::clicked, this, &QDialog::reject);
     patients_model->select ();
 }
 
-QString BindEventDialog::GetPatientId(){
+QString BindEventDialog::GetPatientId() {
     return patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ();
 }
 
-QString BindEventDialog::GetPatient(){
+QString BindEventDialog::GetPatient() {
     return patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), SURNAME_COL)).toString () + " "
            + patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), NAME_COL)).toString () + " "
            + patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), F_NAME_COL)).toString ();
@@ -67,7 +67,13 @@ void BindEventDialog::SetSearchType(QString type) {
 
 void BindEventDialog::SearchTextChanged(QString text) {
     patients_filter_model->setFilterFixedString (text);
+    EnabledOkButton();
 }
+
+void BindEventDialog::EnabledOkButton() {
+    ui->ok_pb->setEnabled(!GetPatientId().isEmpty());
+}
+
 BindEventDialog::~BindEventDialog() {
     delete ui;
 }

@@ -14,6 +14,8 @@ class AppointmentDialog : public QDialog
     Ui::AppointmentDialog *ui;
     DataBase* sdb;
     QVariantList* row;
+private slots:
+    void EnabledOkButton();
 public:
     explicit AppointmentDialog(DataBase* data_base, QVariantList* curr_row,  QWidget *parent = nullptr);
     double GetPrice();

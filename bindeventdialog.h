@@ -18,6 +18,7 @@ class BindEventDialog : public QDialog
 private slots:
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
+    void EnabledOkButton();
 public:
     explicit BindEventDialog(DataBase* data_base, QWidget *parent = nullptr);
     QString GetPatientId();
