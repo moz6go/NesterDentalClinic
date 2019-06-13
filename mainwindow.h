@@ -7,12 +7,16 @@
 #include "addeventdialog.h"
 #include "mycalendarwidget.h"
 #include "alleventsdialog.h"
-#include "mysortfilterproxymodel.h"
+#include "eventsproxymodel.h"
 #include "appointmentdialog.h"
 #include "bindeventdialog.h"
+#include "sqlqueries.h"
+#include "patientvisitsdialog.h"
 
 class AllEventsDialog;
 class BindEventDialog;
+class PatientVisitsDialog;
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,13 +25,14 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
     friend AllEventsDialog;
     friend BindEventDialog;
+    friend PatientVisitsDialog;
 
     Ui::MainWindow *ui;
     DataBase* sdb;
     QSqlTableModel* patients_model;
     QSqlTableModel* events_model;
     QSortFilterProxyModel* patients_filter_model;
-    MySortFilterProxyModel* events_filter_model;
+    EventsProxyModel* events_filter_model;
     QToolBar* toolbar;
     QPixmap patient_photo;
 
@@ -54,7 +59,7 @@ class MainWindow : public QMainWindow {
     void CancelEvents();
 private slots:
     void onActionAddPatient();
-    void onActionEditClient();
+    void onActionEditPatient();
     void onActionToothCard();
     void onActionVisitHistory();
     void onActionAddEvent();

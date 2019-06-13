@@ -89,6 +89,7 @@ const QString COMMENT = "comment";
 
 const QString VISIT_ID = "visit_id";
 const QString VISIT_INIT_DATE = "visit_init_date";
+const QString VISIT_DATE = "visit_date";
 const QString PRICE = "price";
 const QString VISIT_RESULT = "visit_result";
 
@@ -121,10 +122,11 @@ const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
 const QString CREATE_VISITS_TABLE =  "CREATE TABLE " + VISITS_TABLE + " ("
                 + VISIT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
                 + VISIT_INIT_DATE + " TEXT NOT NULL, "
+                + VISIT_DATE + " TEXT NOT NULL, "
                 + PATIENT + " TEXT NOT NULL, "
                 + PRICE + " REAL NOT NULL, "
                 + VISIT_RESULT + " TEXT NOT NULL, "
-                + EVENT_ID + " INTEGER)";
+                + EVENT_ID + " INTEGER NOT NULL)";
 
 const QStringList PATIENTS_HEADERS = {
     "Код пацієта",
@@ -160,6 +162,7 @@ const QStringList STATUS_LIST = {
 
 const QStringList VISITS_TABLE_HEADERS = {
     "Код візиту",
+    "Дата додавання візиту",
     "Дата візиту",
     "Пацієнт",
     "Вартість послуг, грн",
@@ -202,6 +205,7 @@ enum EventsStatus {
 enum VisitsCol{
     VISIT_ID_COL,
     VISIT_INIT_DATE_COL,
+    VISIT_DATE_COL,
     VISIT_PATIENT_COL,
     PRICE_COL,
     VISIT_RESULT_COL,
@@ -210,7 +214,8 @@ enum VisitsCol{
 
 enum Role {
     ADD,
-    EDIT
+    EDIT,
+    READ
 };
 
 

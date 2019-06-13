@@ -21,7 +21,7 @@ public:
     QString GenerateInsertQuery(const QString& table, const QStringList& columns);
     QString GenerateUpdateQuery(const QString& table, const QStringList& columns, const QString& where, const QString& equal);
     QStringList GenerateBindValues(QStringList columns);
-
+    QString Select(const QString& query);
     double SelectSum(const QString& qeury);
 
     QVector<QVariantList> SelectTable(const QString& query,

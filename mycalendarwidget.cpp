@@ -2,9 +2,6 @@
 #include <QtDebug>
 MyCalendarWidget::MyCalendarWidget(QWidget *parent) : QCalendarWidget (parent) {
     curr_date = QDate::currentDate();
-//    blue_pen.setColor (Qt::blue);
-//    red_pen.setColor(Qt::red);
-//    brush.setColor (Qt::transparent);
 }
 
 MyCalendarWidget::~MyCalendarWidget() {}
@@ -18,17 +15,14 @@ void MyCalendarWidget::paintCell (QPainter *painter, const QRect &rect, const QD
     QCalendarWidget::paintCell(painter, rect, date);
     if(active_date_list.contains (date) && date < QDate::currentDate ()){
         painter->setPen(QPen(Qt::gray, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-//        painter->setBrush(brush);
         painter->drawRect(rect.adjusted (0, 0, -1, -1));
     }
     else if (active_date_list.contains (date) && date > QDate::currentDate ()) {
         painter->setPen(QPen(Qt::darkCyan, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-//        painter->setBrush(brush);
         painter->drawRect(rect.adjusted (0, 0, -1, -1));
     }
     else if (date == curr_date) {
         painter->setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-//        painter->setBrush(brush);
         painter->drawRect(rect.adjusted (0, 0, -1, -1));
     }
 

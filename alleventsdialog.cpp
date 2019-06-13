@@ -21,7 +21,7 @@ AllEventsDialog::AllEventsDialog(DataBase *data_base, QWidget *parent) :
     events_model = new QSqlTableModel(this);
     events_model->setTable(EVENTS_TABLE);
     MainWindow::RenameHeaders(events_model->columnCount(), events_model, EVENTS_TABLE_HEADERS);
-    events_filter_model = new MySortFilterProxyModel(this);
+    events_filter_model = new EventsProxyModel(this);
     events_filter_model->setSourceModel(events_model);
     events_filter_model->setFilterKeyColumn(PATIENT_COL);
     events_filter_model->setFilterCaseSensitivity(Qt::CaseInsensitive);

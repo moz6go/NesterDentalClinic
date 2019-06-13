@@ -88,6 +88,12 @@ bool DataBase::UpdateInsertData (const QString& query_str, const QStringList& bi
         return true;
     }
 }
+QString DataBase::Select(const QString &query) {
+    QSqlQuery sel_query;
+    sel_query.exec (query);
+    sel_query.next ();
+    return  sel_query.isValid () ? sel_query.value(0).toString () : QString();
+}
 
 int DataBase::SelectCount(const QString &from) {
     QSqlQuery sel_query;
@@ -262,4 +268,5 @@ QStringList DataBase::GenerateBindValues(QStringList columns) {
     }
     return bind_val;
 }
+
 

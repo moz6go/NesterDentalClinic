@@ -29,6 +29,7 @@ AddEventDialog::AddEventDialog(DataBase* data_base, QVariantList* curr_row, Role
         }
     }
     else {
+        setWindowTitle ("Редагування прийому");
         ui->patient_le->setText(row->at(PATIENT_COL).toString());
         ui->patient_le->setDisabled(true);
         ui->date_de->setDate(row->at(EVENT_DATE_COL).toDate());

@@ -11,10 +11,15 @@ AppointmentDialog::AppointmentDialog(DataBase *data_base, QVariantList *curr_row
     row = curr_row;
     if(row->size()) {
         ui->patient_le->setText (row->at(PATIENT_COL).toString ());
+        ui->visit_date->setDate (QDate::currentDate ());
     }
     QObject::connect(ui->results_te, &QTextEdit::textChanged, this, &AppointmentDialog::EnabledOkButton);
     QObject::connect(ui->ok_pb, &QPushButton::clicked, this, &AppointmentDialog::accept);
     QObject::connect(ui->cancel_pb, &QPushButton::clicked, this, &AppointmentDialog::reject);
+}
+
+QString AppointmentDialog::GetVisitDate() {
+    return ui->visit_date->date ().toString (SQL_DATE_FORMAT);
 }
 
 double AppointmentDialog::GetPrice() {

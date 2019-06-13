@@ -1,10 +1,10 @@
-#include "mysortfilterproxymodel.h"
+#include "eventsproxymodel.h"
 
-MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
+EventsProxyModel::EventsProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
 {
 }
 
-QVariant MySortFilterProxyModel::data(const QModelIndex &item, int role) const
+QVariant EventsProxyModel::data(const QModelIndex &item, int role) const
 {
     if(!item.isValid()){
         return QVariant();

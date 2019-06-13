@@ -3,7 +3,7 @@
 
 #include "general.h"
 #include "database.h"
-#include "mysortfilterproxymodel.h"
+#include "eventsproxymodel.h"
 
 namespace Ui {
 class AllEventsDialog;
@@ -15,7 +15,7 @@ class AllEventsDialog : public QDialog
     Ui::AllEventsDialog *ui;
     DataBase* sdb;
     QSqlTableModel* events_model;
-    MySortFilterProxyModel* events_filter_model;
+    EventsProxyModel* events_filter_model;
 private slots:
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);
