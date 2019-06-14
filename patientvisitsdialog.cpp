@@ -25,7 +25,6 @@ PatientVisitsDialog::PatientVisitsDialog(DataBase *data_base, const QVariantList
 
 }
 
-PatientVisitsDialog::~PatientVisitsDialog()
-{
+PatientVisitsDialog::~PatientVisitsDialog() {
     delete ui;
 }

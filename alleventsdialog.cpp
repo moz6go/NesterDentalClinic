@@ -28,7 +28,7 @@ AllEventsDialog::AllEventsDialog(DataBase *data_base, QWidget *parent) :
     ui->events_table->setModel(events_filter_model);
 
     for (int col = 0; col < events_model->columnCount(); ++col) {
-        if (col == EVENT_ID_COL || col == INIT_DATE_COL || col == EVENT_PATIENT_ID_COL){
+        if (col == EVENT_ID_COL || col == PATIENT_INIT_DATE_COL || col == EVENT_LAST_CHANGES_COL || col == EVENT_PATIENT_ID_COL){
             ui->events_table->setColumnHidden(col, true);
         }
     }

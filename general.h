@@ -67,7 +67,8 @@ const QString DISEASES_TABLE = "diseases";
 
 // columns
 const QString PATIENT_ID = "patient_id";
-const QString INIT_DATE = "init_date";
+const QString PATIENT_INIT_DATE = "patient_init_date";
+const QString PATIENT_LAST_CHANGES = "patient_last_changes";
 const QString SURNAME = "surname";
 const QString NAME = "name";
 const QString F_NAME = "f_name";
@@ -80,6 +81,7 @@ const QString PATIENT_PHOTO = "patient_photo";
 
 const QString EVENT_ID = "event_id";
 const QString EVENT_INIT_DATE = "event_init_date";
+const QString EVENT_LAST_CHANGES = "event_last_changes";
 const QString EVENT_DATE = "event_date";
 const QString EVENT_TIME_FROM = "event_time_from";
 const QString EVENT_TIME_TO = "event_time_to";
@@ -89,6 +91,7 @@ const QString COMMENT = "comment";
 
 const QString VISIT_ID = "visit_id";
 const QString VISIT_INIT_DATE = "visit_init_date";
+const QString VISIT_LAST_CHANGES = "visit_last_changes";
 const QString VISIT_DATE = "visit_date";
 const QString PRICE = "price";
 const QString VISIT_RESULT = "visit_result";
@@ -97,7 +100,8 @@ const QString VISIT_RESULT = "visit_result";
 // create queries
 const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
               + PATIENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-              + INIT_DATE + " TEXT NOT NULL, "
+              + PATIENT_INIT_DATE + " TEXT NOT NULL, "
+              + PATIENT_LAST_CHANGES + " TEXT NOT NULL, "
               + SURNAME + " TEXT NOT NULL, "
               + NAME + " TEXT NOT NULL, "
               + F_NAME + " TEXT NOT NULL, "
@@ -111,6 +115,7 @@ const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
 const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
                 + EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
                 + EVENT_INIT_DATE + " TEXT NOT NULL, "
+                + EVENT_LAST_CHANGES + " TEXT NOT NULL, "
                 + EVENT_DATE + " TEXT NOT NULL, "
                 + EVENT_TIME_FROM + " TEXT NOT NULL, "
                 + EVENT_TIME_TO + " TEXT NOT NULL, "
@@ -122,6 +127,7 @@ const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
 const QString CREATE_VISITS_TABLE =  "CREATE TABLE " + VISITS_TABLE + " ("
                 + VISIT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
                 + VISIT_INIT_DATE + " TEXT NOT NULL, "
+                + VISIT_LAST_CHANGES + " TEXT NOT NULL, "
                 + VISIT_DATE + " TEXT NOT NULL, "
                 + PATIENT + " TEXT NOT NULL, "
                 + PRICE + " REAL NOT NULL, "
@@ -131,6 +137,7 @@ const QString CREATE_VISITS_TABLE =  "CREATE TABLE " + VISITS_TABLE + " ("
 const QStringList PATIENTS_HEADERS = {
     "Код пацієта",
     "Дата заведення картки",
+    "Дата останніх змін в картці",
     "Прізвище",
     "Ім'я",
     "По-батькові",
@@ -145,6 +152,7 @@ const QStringList PATIENTS_HEADERS = {
 const QStringList EVENTS_TABLE_HEADERS = {
     "Код події",
     "Дата додавання події",
+    "Дата останніх змін",
     "Дата",
     "З",
     "По",
@@ -163,6 +171,7 @@ const QStringList STATUS_LIST = {
 const QStringList VISITS_TABLE_HEADERS = {
     "Код візиту",
     "Дата додавання візиту",
+    "Дата останніх змін",
     "Дата візиту",
     "Пацієнт",
     "Вартість послуг, грн",
@@ -172,7 +181,8 @@ const QStringList VISITS_TABLE_HEADERS = {
 
 enum PatientsCol {
     PATIENT_ID_COL,
-    INIT_DATE_COL,
+    PATIENT_INIT_DATE_COL,
+    PATIENT_LAST_CHANGES_COL,
     SURNAME_COL,
     NAME_COL,
     F_NAME_COL,
@@ -187,6 +197,7 @@ enum PatientsCol {
 enum EventsCol{
     EVENT_ID_COL,
     EVENT_INIT_DATE_COL,
+    EVENT_LAST_CHANGES_COL,
     EVENT_DATE_COL,
     EVENT_TIME_FROM_COL,
     EVENT_TIME_TO_COL,
@@ -205,6 +216,7 @@ enum EventsStatus {
 enum VisitsCol{
     VISIT_ID_COL,
     VISIT_INIT_DATE_COL,
+    VISIT_LAST_CHANGES_COL,
     VISIT_DATE_COL,
     VISIT_PATIENT_COL,
     PRICE_COL,

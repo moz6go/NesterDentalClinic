@@ -12,6 +12,7 @@ class AddPatientDialog : public QDialog
     Q_OBJECT
     QString photo_path;
 private slots:
+    void SexChanged(QString sex);
     void LoadPhoto();
     void EnableAddButton();
 public:

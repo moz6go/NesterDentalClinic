@@ -27,6 +27,9 @@ class MainWindow : public QMainWindow {
     friend BindEventDialog;
     friend PatientVisitsDialog;
 
+    int patient_active_row;
+    int event_active_row;
+
     Ui::MainWindow *ui;
     DataBase* sdb;
     QSqlTableModel* patients_model;

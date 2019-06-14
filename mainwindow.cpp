@@ -1,14 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
-
 MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     sdb = data_base;
+
+    patient_active_row = 0;
+    event_active_row = 0;
+
     patient_photo = QPixmap(":/action_icons/default_user.png");
     toolbar = new QToolBar(this);
     BuildToolBar ();
@@ -43,8 +45,9 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
             ui->patients_table->setColumnWidth(col, ui->patients_table->width () / 3);
         }
     }
+
     for (int col = 0; col < events_model->columnCount(); ++col) {
-        if (col == EVENT_ID_COL || col == INIT_DATE_COL || col == EVENT_PATIENT_ID_COL){
+        if (col == EVENT_ID_COL || col == PATIENT_INIT_DATE_COL || col == EVENT_LAST_CHANGES_COL || col == EVENT_PATIENT_ID_COL){
             ui->events_table->setColumnHidden(col, true);
         }
     }
@@ -61,13 +64,11 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QObject::connect (timer, &QTimer::timeout, this, [=] { Update(ui->patients_table->currentIndex ().row ()); });
     QObject::connect (ui->search_cb, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (ui->search_le, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
-    QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowPatientInfo);
     QObject::connect (ui->patients_table, &QTableView::clicked, this, &MainWindow::ShowEventsBySelectedPatient);
-
+    QObject::connect (ui->patients_table, &QTableView::clicked, this,  [=] { Update(ui->patients_table->currentIndex ().row ()); });
     QObject::connect (ui->calendar, &QCalendarWidget::clicked, this, &MainWindow::ShowEventsBySelectedDate );
     timer->start (60000);
     Update(0);
-    ShowPatientInfo();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -80,7 +81,7 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 void MainWindow::BuildToolBar() {
     action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
     action_edit_patient = toolbar->addAction(QPixmap(":/action_icons/edit_patient.png"), "Редагувати дані пацієнта", this, SLOT(onActionEditPatient()));
-    action_tooth_card = toolbar->addAction(QPixmap(":/action_icons/tooth_card.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionToothCard()));
+//    action_tooth_card = toolbar->addAction(QPixmap(":/action_icons/tooth_card.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionToothCard()));
     action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути історію візитів пацієнта", this, SLOT(onActionVisitHistory()));
     toolbar->addSeparator ();
     action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
@@ -113,10 +114,15 @@ void MainWindow::TableInit(QTableView *table) {
 }
 
 void MainWindow::Update(int row) {
+    patient_active_row = row;
+    event_active_row = ui->events_table->currentIndex().row();
+
     events_model->select();
     patients_model->select ();
     patients_filter_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
-    ui->patients_table->selectRow (row);
+    ui->patients_table->selectRow (patient_active_row);
+    ui->events_table->selectRow(event_active_row);
+    ShowPatientInfo();
     CancelEvents();
     UpdateButtons();
     GetActiveEventsDateList();
@@ -146,14 +152,15 @@ void MainWindow::CancelEvents() {
         QDateTime event_date_time  = QDateTime(events_model->data(events_model->index (row, EVENT_DATE_COL)).toDate (), events_model->data(events_model->index (row, EVENT_TIME_TO_COL)).toTime ());
         QString event_status = events_model->data(events_model->index (row, EVENT_STATUS_COL)).toString();
         if ( event_date_time < QDateTime::currentDateTime () && event_status == STATUS_LIST[ACTIVE]){
-            QVariantList data = { STATUS_LIST[CANCELED] };
-            QStringList columns = { EVENT_STATUS };
+            QVariantList data = { QDateTime::currentDateTime ().toString(SQL_DATE_TIME_FORMAT), STATUS_LIST[CANCELED] };
+            QStringList columns = { EVENT_LAST_CHANGES, EVENT_STATUS };
             sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                    sdb->GenerateBindValues (columns),
                                    data);
         }
     }
 }
+
 
 
 void MainWindow::onActionAddPatient() {
@@ -166,6 +173,7 @@ void MainWindow::onActionAddPatient() {
         pic.save (&buff, "JPG");
 
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               add_patient->GetSurname (),
                               add_patient->GetName (),
                               add_patient->GetFName (),
@@ -176,7 +184,7 @@ void MainWindow::onActionAddPatient() {
                               add_patient->GetIllnesses(),
                               pic_byte_arr };
 
-        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES, PATIENT_PHOTO };
+        QStringList columns = { PATIENT_INIT_DATE, PATIENT_LAST_CHANGES, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES, PATIENT_PHOTO };
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (PATIENTS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
@@ -207,7 +215,7 @@ void MainWindow::onActionEditPatient() {
                               edit_patient->GetCity(),
                               edit_patient->GetTelNumber (),
                               edit_patient->GetIllnesses() };
-        QStringList columns = { INIT_DATE, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
+        QStringList columns = { PATIENT_LAST_CHANGES, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
 
         if (!edit_patient->GetPhotoPath ().isEmpty ()){
             data.append ( pic_byte_arr);
@@ -241,6 +249,7 @@ void MainWindow::onActionAddEvent() {
     AddEventDialog* add_event = new AddEventDialog(sdb, &row, ADD, this);
     if(add_event->exec () == QDialog::Accepted){
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               add_event->GetDate (),
                               add_event->GetTimeFrom (),
                               add_event->GetTimeTo (),
@@ -249,7 +258,7 @@ void MainWindow::onActionAddEvent() {
                               add_event->GetComment (),
                               add_event->GetPatientId ()
                             };
-        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
+        QStringList columns = { EVENT_INIT_DATE, EVENT_LAST_CHANGES, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, PATIENT, EVENT_STATUS, COMMENT, PATIENT_ID };
 
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (EVENTS_TABLE, columns),
                                     sdb->GenerateBindValues (columns),
@@ -284,7 +293,7 @@ void MainWindow::onActionEditEvent() {
                               edit_event->GetTimeTo(),
                               edit_event->GetComment()
                             };
-        QStringList columns = { EVENT_INIT_DATE, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, COMMENT};
+        QStringList columns = { EVENT_LAST_CHANGES, EVENT_DATE, EVENT_TIME_FROM, EVENT_TIME_TO, COMMENT};
 
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, row.at(EVENT_ID_COL).toString ()),
                                     sdb->GenerateBindValues (columns),
@@ -319,7 +328,7 @@ void MainWindow::onActionCancelEvent() {
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               STATUS_LIST[CANCELED]
                             };
-        QStringList columns = { EVENT_INIT_DATE, EVENT_STATUS};
+        QStringList columns = { EVENT_LAST_CHANGES, EVENT_STATUS };
 
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                     sdb->GenerateBindValues (columns),
@@ -352,8 +361,8 @@ void MainWindow::onActionBindEvent() {
     }
     BindEventDialog* bind_event = new BindEventDialog(sdb, this);
     if(bind_event->exec () == QDialog::Accepted){
-        QVariantList data = {  bind_event->GetPatient (), bind_event->GetPatientId () };
-        QStringList columns = { PATIENT, PATIENT_ID};
+        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT), bind_event->GetPatient (), bind_event->GetPatientId () };
+        QStringList columns = { EVENT_LAST_CHANGES, PATIENT, PATIENT_ID };
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
@@ -389,16 +398,17 @@ void MainWindow::onActionAppointment() {
     AppointmentDialog* appointment = new AppointmentDialog(sdb, &row, this);
     if(appointment->exec() == QDialog::Accepted){
         QVariantList data_events = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT), STATUS_LIST[EXECUTED] };
-        QStringList columns_events = { EVENT_INIT_DATE, EVENT_STATUS};
+        QStringList columns_events = { EVENT_LAST_CHANGES, EVENT_STATUS};
 
         QVariantList data_visits = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                                     QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                                      row.at (PATIENT_COL).toString (),
                                      appointment->GetVisitDate (),
                                      appointment->GetPrice (),
                                      appointment->GetResults (),
                                      event_id
                                    };
-        QStringList columns_visits = { VISIT_INIT_DATE, PATIENT, VISIT_DATE, PRICE, VISIT_RESULT, EVENT_ID};
+        QStringList columns_visits = { VISIT_INIT_DATE, VISIT_LAST_CHANGES, PATIENT, VISIT_DATE, PRICE, VISIT_RESULT, EVENT_ID};
 
 
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns_events, EVENT_ID, event_id),
@@ -422,15 +432,14 @@ void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString(SQL_DATE_FORMAT));
     events_filter_model->sort (EVENT_TIME_FROM_COL);
-    Update(ui->patients_table->currentIndex().row());
 }
 
 void MainWindow::ShowEventsBySelectedPatient() {
+    QString patient_id = patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ();
     events_filter_model->setFilterKeyColumn(EVENT_PATIENT_ID_COL);
-    events_filter_model->setFilterFixedString(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ());
+    events_filter_model->setFilterRegExp(QString("^%1$").arg(patient_id));
     events_filter_model->sort (EVENT_TIME_FROM_COL);
     events_filter_model->sort (EVENT_DATE_COL);
-    Update(ui->patients_table->currentIndex().row());
 }
 
 void MainWindow::ShowPatientInfo() {

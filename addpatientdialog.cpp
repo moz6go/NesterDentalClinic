@@ -38,12 +38,24 @@ AddPatientDialog::AddPatientDialog(const QVariantList& row, QWidget *parent) :
         EnableAddButton();
     }
 
+    QObject::connect (ui->sex_cb, &QComboBox::currentTextChanged, this, &AddPatientDialog::SexChanged);
     QObject::connect (ui->load_photo_pb, &QPushButton::clicked, this, &AddPatientDialog::LoadPhoto);
     QObject::connect (ui->s_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
     QObject::connect (ui->name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
     QObject::connect (ui->f_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
     QObject::connect (ui->add_pb, &QPushButton::clicked, this, &QDialog::accept);
     QObject::connect (ui->cancel_pb, &QPushButton::clicked, this, &QDialog::reject);
+}
+
+void AddPatientDialog::SexChanged(QString sex) {
+    if(photo_path.isEmpty()){
+        if(sex == "Чоловіча"){
+            ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user.png"));
+        }
+        else {
+            ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user_female.png"));
+        }
+    }
 }
 
 void AddPatientDialog::LoadPhoto() {
