@@ -95,67 +95,60 @@ QString DataBase::Select(const QString &query) {
     return  sel_query.isValid () ? sel_query.value(0).toString () : QString();
 }
 
-int DataBase::SelectCount(const QString &from) {
+int DataBase::SelectCount(const QString &query) {
     QSqlQuery sel_query;
-    sel_query.exec ("SELECT COUNT(*) FROM " + from);
+    sel_query.exec (query);
     sel_query.next ();
-    return sel_query.value (0).toInt ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 double DataBase::SelectSum(const QString &query) {
     QSqlQuery sel_query;
     sel_query.exec (query);
     sel_query.next ();
-    return sel_query.value (0).toDouble ();
+    return sel_query.isValid () ? sel_query.value (0).toDouble () : 0.0;
 }
 
-//QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to) {
-//    QVector<QVariantList> table;
-//    QLocale loc(QLocale::Ukrainian, QLocale::Ukraine);
-//    QSqlQuery query;
-//    query.exec ("SELECT " + table_name + ".*, " + MODELS_TABLE + "." + CATEGORY + ", "
-//                                                + MODELS_TABLE + "." + SEASON + ", "
-//                                                + MODELS_TABLE + "." + WHOLESALE_PRICE + ", "
-//                                                + MODELS_TABLE + "." + RETAIL_PRICE +
-//                " FROM " + table_name +
-//                " INNER JOIN " + MODELS_TABLE + " ON " + table_name + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
-//                " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'");
-//    QSqlRecord rec = query.record ();
+QVector<QVariantList> DataBase::SelectTable(const QString &str_query) {
+    QVector<QVariantList> table;
+    QSqlQuery query;
+    query.exec (str_query);
+    QSqlRecord rec = query.record ();
 
-//    QVariantList header;
-//    for(int col = 0; col < rec.count(); ++col){
-//        QSqlField field = rec.field(col);
-//        header.append (field.name());
-//    }
-//    table.append (header);
+    QVariantList header;
+    for(int col = 0; col < rec.count(); ++col){
+        QSqlField field = rec.field(col);
+        header.append (field.name());
+    }
+    table.append (header);
 
-//    while(query.next ()){
-//        QVariantList row;
-//        for(int col = 0; col < rec.count(); ++col) {
-//            if (rec.field(col).type () == QVariant::Double){
-//                row.append (QVariant(loc.toString (query.value (col).toDouble ())));
-//            }
-//            else {
-//                row.append (query.value (col));
-//            }
-//        }
-//        table.append (row);
-//    }
-//    return table;
-//}
+    while(query.next ()){
+        QVariantList row;
+        for(int col = 0; col < rec.count(); ++col) {
+            if (rec.field(col).type () == QVariant::Double){
+                row.append (QVariant(query.value (col).toString ().replace(" ", "").replace (".", ",")));
+            }
+            else {
+                row.append (query.value (col));
+            }
+        }
+        table.append (row);
+    }
+    return table;
+}
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString& equal_sign, const QString &equal) {
-    QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " " + equal_sign + " '" + equal + "'");
-    query.next ();
-    return query.value (0).toInt ();
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " " + equal_sign + " '" + equal + "'");
+    sel_query.next ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 int DataBase::SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal_sign1, const QString& equal_sign2, const QString& equal1, const QString& equal2) {
-    QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " " + equal_sign1 + " '" + equal1 + "' AND " + where2 + " " + equal_sign2 + " " + equal2 );
-    query.next ();
-    return query.value (0).toInt ();
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " " + equal_sign1 + " '" + equal1 + "' AND " + where2 + " " + equal_sign2 + " " + equal2 );
+    sel_query.next ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 bool DataBase::DeleteRow(const QString &from, const QString &where, const QString &equal) {

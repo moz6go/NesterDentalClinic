@@ -25,5 +25,4 @@ void MyCalendarWidget::paintCell (QPainter *painter, const QRect &rect, const QD
         painter->setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         painter->drawRect(rect.adjusted (0, 0, -1, -1));
     }
-
 }

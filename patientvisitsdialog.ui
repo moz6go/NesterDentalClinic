@@ -81,7 +81,13 @@ font-style: italic;
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="visits_table"/>
+    <widget class="QTableView" name="visits_table">
+     <property name="font">
+      <font>
+       <family>Comic Sans MS</family>
+      </font>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

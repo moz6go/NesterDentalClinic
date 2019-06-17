@@ -9,9 +9,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>548</width>
-    <height>354</height>
+    <width>540</width>
+    <height>380</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>540</width>
+    <height>380</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>540</width>
+    <height>380</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -29,7 +41,7 @@
    <property name="geometry">
     <rect>
      <x>390</x>
-     <y>20</y>
+     <y>24</y>
      <width>142</width>
      <height>203</height>
     </rect>
@@ -95,8 +107,8 @@
     <rect>
      <x>20</x>
      <y>24</y>
-     <width>362</width>
-     <height>321</height>
+     <width>361</width>
+     <height>324</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -317,6 +329,22 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="warning_lbl">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>361</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel { color: red}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
   </widget>
  </widget>
  <resources>

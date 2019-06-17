@@ -96,7 +96,6 @@ const QString VISIT_DATE = "visit_date";
 const QString PRICE = "price";
 const QString VISIT_RESULT = "visit_result";
 
-
 // create queries
 const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
               + PATIENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
@@ -179,6 +178,10 @@ const QStringList VISITS_TABLE_HEADERS = {
     "Код події"
 };
 
+const QStringList REPORTS_TYPES = {
+    "Виконані прийоми за період"
+};
+
 enum PatientsCol {
     PATIENT_ID_COL,
     PATIENT_INIT_DATE_COL,
@@ -230,6 +233,9 @@ enum Role {
     READ
 };
 
+enum ReportsTypes {
+    VISITS_REPORT
+};
 
 #endif // GENERAL
 

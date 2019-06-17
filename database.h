@@ -22,13 +22,11 @@ public:
     QString GenerateUpdateQuery(const QString& table, const QStringList& columns, const QString& where, const QString& equal);
     QStringList GenerateBindValues(QStringList columns);
     QString Select(const QString& query);
+    QString Select(const QString &select, const QString& from, const QString& where, const QString& equal);
     double SelectSum(const QString& qeury);
 
-    QVector<QVariantList> SelectTable(const QString& query,
-                                      const QString& where,
-                                      const QString& date_from,
-                                      const QString& date_to);
-    int SelectCount(const QString& from);
+    QVector<QVariantList> SelectTable(const QString& query);
+    int SelectCount(const QString& query);
     int SelectCount(const QString& from,
                     const QString& where,
                     const QString& equal_sign,
@@ -48,7 +46,6 @@ public:
                          const QString& where,
                          const QString& equal);
 
-    QString Select(const QString &select, const QString& from, const QString& where, const QString& equal);
     QString SelectMultiEqual(const QString &select, const QString &from, const QString &expresion);
     QVariantList SelectRow(const QString& select,
                            const QString& from,

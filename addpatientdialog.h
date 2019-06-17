@@ -2,6 +2,8 @@
 #define ADDPATIENTDIALOG_H
 
 #include "general.h"
+#include "database.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class AddPatientDialog;
@@ -11,6 +13,8 @@ class AddPatientDialog : public QDialog
 {
     Q_OBJECT
     QString photo_path;
+    DataBase* sdb;
+    QVariantList row;
 private slots:
     void SexChanged(QString sex);
     void LoadPhoto();
@@ -25,7 +29,7 @@ public:
     QString GetCity();
     QString GetTelNumber();
     QString GetIllnesses();
-    explicit AddPatientDialog(const QVariantList& row, QWidget *parent = nullptr);
+    explicit AddPatientDialog(DataBase* data_base, const QVariantList& row, QWidget *parent = nullptr);
     ~AddPatientDialog();
 
 private:

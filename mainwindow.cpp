@@ -31,7 +31,7 @@ MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     events_model = new QSqlTableModel(this);
     events_model->setTable(EVENTS_TABLE);
     RenameHeaders(events_model->columnCount(), events_model, EVENTS_TABLE_HEADERS);
-    events_filter_model = new EventsProxyModel(this);
+    events_filter_model = new MyEventsProxyModel(this);
     events_filter_model->setSourceModel(events_model);
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(QDate::currentDate().toString(SQL_DATE_FORMAT));
@@ -79,18 +79,21 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 }
 
 void MainWindow::BuildToolBar() {
-    action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Додати пацієнта", this, SLOT(onActionAddPatient()));
-    action_edit_patient = toolbar->addAction(QPixmap(":/action_icons/edit_patient.png"), "Редагувати дані пацієнта", this, SLOT(onActionEditPatient()));
+    action_add_patient = toolbar->addAction(QPixmap(":/action_icons/add_patient.png"), "Створити картку пацієнта", this, SLOT(onActionAddPatient()));
+    action_edit_patient = toolbar->addAction(QPixmap(":/action_icons/edit_patient.png"), "Редагувати картку пацієнта", this, SLOT(onActionEditPatient()));
 //    action_tooth_card = toolbar->addAction(QPixmap(":/action_icons/tooth_card.png"), "Переглянути зубну картку пацієнта", this, SLOT(onActionToothCard()));
     action_visit_history = toolbar->addAction(QPixmap(":/action_icons/med_journal.png"), "Переглянути історію візитів пацієнта", this, SLOT(onActionVisitHistory()));
     toolbar->addSeparator ();
     action_add_event = toolbar->addAction(QPixmap(":/action_icons/add_event.png"), "Записати на прийом", this, SLOT(onActionAddEvent()));
     action_edit_event = toolbar->addAction(QPixmap(":/action_icons/edit_event.png"), "Змінити дані прийому", this, SLOT(onActionEditEvent()));
     action_cancel_event = toolbar->addAction(QPixmap(":/action_icons/cancel_event.png"), "Скасувати прийом", this, SLOT(onActionCancelEvent()));
-    action_all_active_events = toolbar->addAction(QPixmap(":/action_icons/all_events.png"), "Переглянути майбутні прийоми", this, SLOT(onActionAllEvents()));
+    action_all_active_events = toolbar->addAction(QPixmap(":/action_icons/all_events.png"), "Переглянути всі записи на прийом", this, SLOT(onActionAllEvents()));
     action_bind_event = toolbar->addAction(QPixmap(":/action_icons/bind_event.png"), "Прив'язати прийом до картки клієнта", this, SLOT(onActionBindEvent()));
     toolbar->addSeparator ();
     action_appointment = toolbar->addAction(QPixmap(":/action_icons/appointment.png"), "Записати дані про прийом", this, SLOT(onActionAppointment()));
+    toolbar->addSeparator ();
+    action_report = toolbar->addAction(QPixmap(":/action_icons/report.png"), "Сформувати звіт", this, SLOT(onActionReport()));
+
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
     addToolBar(Qt::TopToolBarArea, toolbar);
@@ -161,10 +164,30 @@ void MainWindow::CancelEvents() {
     }
 }
 
+void MainWindow::CreateReportCSV(const QVector<QVariantList> &table, const QString &path) {
+    QFile report_csv(path + "/report " + QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT).replace (":", "-") + ".csv");
+        if(report_csv.open(QIODevice::WriteOnly)){
+            QTextStream fout(&report_csv);
+
+            #if defined(_WIN32)
+                fout << "sep =,\n";
+            #endif
+
+            for (auto& row : table) {
+                for(const QVariant& cell : row ) {
+                    fout << "\"" + cell.toString () + "\",";
+                }
+                fout << '\n';
+            }
+            report_csv.close ();
+            ui->statusBar->showMessage ("Звіт сформовано і збережено в папці " + path);
+        }
+}
+
 
 
 void MainWindow::onActionAddPatient() {
-    AddPatientDialog* add_patient = new AddPatientDialog (QVariantList(), this);
+    AddPatientDialog* add_patient = new AddPatientDialog (sdb, QVariantList(), this);
     if(add_patient->exec () == QDialog::Accepted) {
         QPixmap pic(add_patient->GetPhotoPath ());
         QByteArray pic_byte_arr;
@@ -199,14 +222,14 @@ void MainWindow::onActionAddPatient() {
 
 void MainWindow::onActionEditPatient() {
     QVariantList row = sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount());
-    AddPatientDialog* edit_patient = new AddPatientDialog (row, this);
+    AddPatientDialog* edit_patient = new AddPatientDialog (sdb, row, this);
     if(edit_patient->exec() == QDialog::Accepted){
         QPixmap pic(edit_patient->GetPhotoPath ());
         QByteArray pic_byte_arr;
         QBuffer buff(&pic_byte_arr);
         buff.open (QIODevice::WriteOnly);
         pic.save (&buff, "JPG");
-        QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+        QVariantList patient_data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               edit_patient->GetSurname (),
                               edit_patient->GetName (),
                               edit_patient->GetFName (),
@@ -215,18 +238,28 @@ void MainWindow::onActionEditPatient() {
                               edit_patient->GetCity(),
                               edit_patient->GetTelNumber (),
                               edit_patient->GetIllnesses() };
-        QStringList columns = { PATIENT_LAST_CHANGES, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
+        QStringList patient_columns = { PATIENT_LAST_CHANGES, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
 
         if (!edit_patient->GetPhotoPath ().isEmpty ()){
-            data.append ( pic_byte_arr);
-            columns.append (PATIENT_PHOTO);
+            patient_data.append ( pic_byte_arr);
+            patient_columns.append (PATIENT_PHOTO);
         }
 
-        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (PATIENTS_TABLE, columns, PATIENT_ID, row.at(PATIENT_ID_COL).toString ()),
-                                    sdb->GenerateBindValues (columns),
-                                    data)) {
+        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (PATIENTS_TABLE, patient_columns, PATIENT_ID, row.at(PATIENT_ID_COL).toString ()),
+                                    sdb->GenerateBindValues (patient_columns),
+                                    patient_data)) {
             QMessageBox::critical (this, "Error!", "Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
             ui->statusBar->showMessage ("Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
+            return;
+        }
+        QVariantList event_data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                                    edit_patient->GetSurname () + " " + edit_patient->GetName () + " " + edit_patient->GetFName () };
+        QStringList event_columns = { EVENT_LAST_CHANGES, PATIENT };
+
+
+        if(!sdb->UpdateInsertData(sdb->GenerateUpdateQuery (EVENTS_TABLE, event_columns, PATIENT_ID, row.at(PATIENT_ID_COL).toString () ),
+                                  sdb->GenerateBindValues (event_columns),
+                                  event_data)){
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
@@ -427,11 +460,32 @@ void MainWindow::onActionAppointment() {
     }
 }
 
+void MainWindow::onActionReport() {
+    ReportDialog* report_dialog = new ReportDialog(sdb, this);
+    if(report_dialog->exec () == QDialog::Accepted) {
+        QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти звіт в ..."),
+                                                        QDir::homePath (),
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if(!path.isEmpty ()) {
+            QVector<QVariantList> table;
+            switch (report_dialog->GetReportType ()) {
+            case VISITS_REPORT:
+                table = sdb->SelectTable (SqlQueries::VisitsForReport(report_dialog->GetDateFrom (), report_dialog->GetDateTo ()));
+                for (int row = 0; row < table.at(0).size (); ++row) {
+                    table[0][row] = QVariant(VISITS_TABLE_HEADERS.at (row + VISIT_DATE_COL));
+                }
+                break;
+            }
+            CreateReportCSV (table, path);
+        }
+    }}
+
 
 void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);
     events_filter_model->setFilterFixedString(ui->calendar->selectedDate().toString(SQL_DATE_FORMAT));
     events_filter_model->sort (EVENT_TIME_FROM_COL);
+    UpdateButtons();
 }
 
 void MainWindow::ShowEventsBySelectedPatient() {
@@ -456,7 +510,7 @@ void MainWindow::ShowPatientInfo() {
     }
 
     QDate b_date = QDate::fromString (patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), B_DATE_COL)).toString (), SQL_DATE_FORMAT);
-    int age = QDate::currentDate ().addYears (-b_date.year ()).addMonths (-b_date.month () + 1).addDays (-b_date.day () + 1).year ();
+    int age = QDate::currentDate ().addYears ( - b_date.year ()).addMonths ( - b_date.month () + 1).addDays ( - b_date.day () + 1).year ();
     QString patient_id = patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString ();
 
     ui->surname_le->        setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), SURNAME_COL)).toString ());
@@ -466,7 +520,7 @@ void MainWindow::ShowPatientInfo() {
     ui->sex_le->            setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), SEX_COL)).toString ());
     ui->city_le->           setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), CITY_COL)).toString ());
     ui->tel_number_le->     setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), TEL_NUMBER_COL)).toString ());
-    ui->last_visit_date_le->setText (QDate::fromString (sdb->Select (SqlQueries::GetMaxVisitDateQuery (patient_id)), SQL_DATE_FORMAT).toString (DATE_FORMAT));
+    ui->last_visit_date_le->setText (QDate::fromString (sdb->Select (SqlQueries::MaxVisitDateQuery (patient_id)), SQL_DATE_FORMAT).toString (DATE_FORMAT));
     ui->illnesses_le->      setText(patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), ILLNESSES_COL)).toString ());
 }
 

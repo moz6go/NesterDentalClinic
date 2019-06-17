@@ -12,6 +12,7 @@ AddEventDialog::AddEventDialog(DataBase* data_base, QVariantList* curr_row, Role
     ui->date_de->setMinimumDate (QDate::currentDate ());
 
     if (role == ADD){
+        event_id = "";
         ui->time_from_te->setMinimumTime (QTime::currentTime ());
         ui->time_to_te->setMinimumTime(QTime::currentTime());
 
@@ -30,6 +31,7 @@ AddEventDialog::AddEventDialog(DataBase* data_base, QVariantList* curr_row, Role
     }
     else {
         setWindowTitle ("Редагування прийому");
+        event_id = row->at (EVENT_ID_COL).toString ();
         ui->patient_le->setText(row->at(PATIENT_COL).toString());
         ui->patient_le->setDisabled(true);
         ui->date_de->setDate(row->at(EVENT_DATE_COL).toDate());
@@ -65,17 +67,10 @@ void AddEventDialog::EnabledOkButton() {
 }
 
 void AddEventDialog::CheckFreeTime() {
-    QString patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE,
-                                             EVENT_DATE + " = '" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
-                                             "' AND (" + EVENT_TIME_FROM + " <= '" + ui->time_from_te->time ().toString (TIME_FORMAT) +
-                                             "' AND " + EVENT_TIME_TO + " > '" + ui->time_from_te->time ().toString (TIME_FORMAT) + "')" +
-                                             " AND " + EVENT_STATUS + " = '" + STATUS_LIST[ACTIVE] + "'");
+    QString patient = sdb->Select(SqlQueries::CheckDateTimeFrom (ui->date_de->date ().toString (SQL_DATE_FORMAT), ui->time_from_te->time ().toString (TIME_FORMAT), event_id));
+
     if (patient.isEmpty ()){
-        patient = sdb->SelectMultiEqual (PATIENT, EVENTS_TABLE,
-                                         EVENT_DATE + " = '" + ui->date_de->date ().toString (SQL_DATE_FORMAT) +
-                                         "' AND (" + EVENT_TIME_FROM + " < '" + ui->time_to_te->time ().toString (TIME_FORMAT) +
-                                         "' AND " + EVENT_TIME_TO + " > '" + ui->time_to_te->time ().toString (TIME_FORMAT) + "')" +
-                                         " AND " + EVENT_STATUS + " = '" + STATUS_LIST[ACTIVE] + "'");
+        patient = sdb->Select(SqlQueries::CheckDateTimeTo (ui->date_de->date ().toString (SQL_DATE_FORMAT),  ui->time_to_te->time ().toString (TIME_FORMAT), event_id));
     }
 
     if (patient.size ()){

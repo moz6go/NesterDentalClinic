@@ -7,11 +7,12 @@
 #include "addeventdialog.h"
 #include "mycalendarwidget.h"
 #include "alleventsdialog.h"
-#include "eventsproxymodel.h"
+#include "myeventsproxymodel.h"
 #include "appointmentdialog.h"
 #include "bindeventdialog.h"
 #include "sqlqueries.h"
 #include "patientvisitsdialog.h"
+#include "reportdialog.h"
 
 class AllEventsDialog;
 class BindEventDialog;
@@ -35,7 +36,7 @@ class MainWindow : public QMainWindow {
     QSqlTableModel* patients_model;
     QSqlTableModel* events_model;
     QSortFilterProxyModel* patients_filter_model;
-    EventsProxyModel* events_filter_model;
+    MyEventsProxyModel* events_filter_model;
     QToolBar* toolbar;
     QPixmap patient_photo;
 
@@ -52,6 +53,8 @@ class MainWindow : public QMainWindow {
 
     QAction* action_appointment;
 
+    QAction* action_report;
+
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
     static void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
@@ -60,6 +63,7 @@ class MainWindow : public QMainWindow {
     void UpdateButtons();
     void GetActiveEventsDateList();
     void CancelEvents();
+    void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
 private slots:
     void onActionAddPatient();
     void onActionEditPatient();
@@ -71,6 +75,7 @@ private slots:
     void onActionAllEvents();
     void onActionBindEvent();
     void onActionAppointment();
+    void onActionReport();
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);

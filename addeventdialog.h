@@ -3,6 +3,7 @@
 
 #include "general.h"
 #include "database.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class AddEventDialog;
@@ -14,6 +15,7 @@ class AddEventDialog : public QDialog
     Ui::AddEventDialog *ui;
     QVariantList* row;
     DataBase* sdb;
+    QString event_id;
 private slots:
     void SetTimeTo(QTime time_from);
     void SetMinTimeFrom();
