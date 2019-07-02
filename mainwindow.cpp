@@ -93,6 +93,8 @@ void MainWindow::BuildToolBar() {
     action_appointment = toolbar->addAction(QPixmap(":/action_icons/appointment.png"), "Записати дані про прийом", this, SLOT(onActionAppointment()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/action_icons/report.png"), "Сформувати звіт", this, SLOT(onActionReport()));
+    toolbar->addSeparator ();
+    action_copy_restore = toolbar->addAction(QPixmap(":/action_icons/db_copy_restore.png"), "Резервна копія/відновлення бази даних", this, SLOT(onActionCopyRestoreDb()));
 
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
@@ -189,11 +191,13 @@ void MainWindow::CreateReportCSV(const QVector<QVariantList> &table, const QStri
 void MainWindow::onActionAddPatient() {
     AddPatientDialog* add_patient = new AddPatientDialog (sdb, QVariantList(), this);
     if(add_patient->exec () == QDialog::Accepted) {
-        QPixmap pic(add_patient->GetPhotoPath ());
         QByteArray pic_byte_arr;
-        QBuffer buff(&pic_byte_arr);
-        buff.open (QIODevice::WriteOnly);
-        pic.save (&buff, "JPG");
+        if(add_patient->GetPhotoPath ().size ()){
+            QPixmap pic(add_patient->GetPhotoPath ());
+            QBuffer buff(&pic_byte_arr);
+            buff.open (QIODevice::WriteOnly);
+            pic.save (&buff, "JPG");
+        }
 
         QVariantList data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
@@ -224,11 +228,6 @@ void MainWindow::onActionEditPatient() {
     QVariantList row = sdb->SelectRow ("*", PATIENTS_TABLE, PATIENT_ID, patients_filter_model->data(patients_filter_model->index (ui->patients_table->currentIndex ().row (), PATIENT_ID_COL)).toString (), patients_model->columnCount());
     AddPatientDialog* edit_patient = new AddPatientDialog (sdb, row, this);
     if(edit_patient->exec() == QDialog::Accepted){
-        QPixmap pic(edit_patient->GetPhotoPath ());
-        QByteArray pic_byte_arr;
-        QBuffer buff(&pic_byte_arr);
-        buff.open (QIODevice::WriteOnly);
-        pic.save (&buff, "JPG");
         QVariantList patient_data = { QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
                               edit_patient->GetSurname (),
                               edit_patient->GetName (),
@@ -240,7 +239,17 @@ void MainWindow::onActionEditPatient() {
                               edit_patient->GetIllnesses() };
         QStringList patient_columns = { PATIENT_LAST_CHANGES, SURNAME, NAME, F_NAME, B_DATE, SEX, CITY, TEL_NUMBER, ILLNESSES };
 
-        if (!edit_patient->GetPhotoPath ().isEmpty ()){
+        if (edit_patient->GetPhotoPath ().isEmpty () && edit_patient->isPicDeleted ()){
+            patient_data.append (QByteArray());
+            patient_columns.append (PATIENT_PHOTO);
+        }
+        else if (!edit_patient->GetPhotoPath ().isEmpty ()) {
+            QPixmap pic(edit_patient->GetPhotoPath ());
+            QByteArray pic_byte_arr;
+            QBuffer buff(&pic_byte_arr);
+            buff.open (QIODevice::WriteOnly);
+            pic.save (&buff, "JPG");
+
             patient_data.append ( pic_byte_arr);
             patient_columns.append (PATIENT_PHOTO);
         }
@@ -478,8 +487,57 @@ void MainWindow::onActionReport() {
             }
             CreateReportCSV (table, path);
         }
-    }}
+    }
+}
 
+void MainWindow::onActionReserveCopy() {
+    QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
+                                                    QDir::homePath (),
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(QFile::copy (DB_PATH, path + "/ndc_db " + QDateTime::currentDateTime ().toString (FS_DATE_TIME_FORMAT) + ".sqlite3")){
+        ui->statusBar->showMessage ("Резервну копію бази даних збережено в папці " + path );
+    }
+    else {
+        ui->statusBar->showMessage ("Не вдалось зробити копію бази даних!");
+    }
+}
+
+void MainWindow::onActionRestore() {
+    QMessageBox msgbox;
+    msgbox.setIcon (QMessageBox::Warning);
+    msgbox.setWindowTitle ("Відновлення бази даних");
+    msgbox.setText ("УВАГА!!! Після здійснення відновлення бази даних, поточні дані видаляться!!!\n\nРекомендуємо перед відновленням зберегти резервну копію поточної бази даних.");
+    msgbox.addButton ("Відновити без збереження", QMessageBox::AcceptRole);
+    msgbox.addButton ("Скасувати", QMessageBox::RejectRole);
+
+    if(msgbox.exec () == QMessageBox::AcceptRole) {
+        QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
+        if (!path.isEmpty ()){
+            sdb->CloseDataBase ();
+            if (QFile::remove (DB_PATH)) {
+                if(QFile::copy (path, DB_PATH)){
+                    //sdb = new DataBase();
+                    if (!sdb->ConnectToDataBase (DB_PATH)) {
+                        QMessageBox::critical (this, "Error!", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+                    }
+                    Update(0);
+                    ui->statusBar->showMessage ("Базу даних відновлено!");
+                    QMessageBox::information (this, "NDC", "Для коректної роботи після відновлення бази даних, рекомендується перезапутити програму", QMessageBox::Ok);
+                }
+                else {
+                    QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
+                }
+            }
+            else {
+                QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
+            }
+        }
+    }
+}
+
+void MainWindow::onActionCopyRestoreDb() {
+
+}
 
 void MainWindow::ShowEventsBySelectedDate() {
     events_filter_model->setFilterKeyColumn(EVENT_DATE_COL);

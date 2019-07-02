@@ -58,6 +58,7 @@ const QString DATE_FORMAT = "dd.MM.yyyy";
 const QString TIME_FORMAT = "hh:mm";
 const QString SQL_DATE_FORMAT = "yyyy-MM-dd";
 const QString SQL_DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
+const QString FS_DATE_TIME_FORMAT = "yyyy-MM-dd hh-mm-ss";
 // tables
 const QString PATIENTS_TABLE = "patients";
 const QString EVENTS_TABLE = "events";

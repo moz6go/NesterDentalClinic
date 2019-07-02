@@ -14,5 +14,7 @@
         <file>action_icons/bind_event.png</file>
         <file>action_icons/default_user_female.png</file>
         <file>action_icons/report.png</file>
+        <file>action_icons/close.png</file>
+        <file>action_icons/db_copy_restore.png</file>
     </qresource>
 </RCC>

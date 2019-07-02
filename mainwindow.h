@@ -55,6 +55,8 @@ class MainWindow : public QMainWindow {
 
     QAction* action_report;
 
+    QAction* action_copy_restore;
+
     void resizeEvent(QResizeEvent *event);
     void BuildToolBar();
     static void RenameHeaders(int column_count, QSqlTableModel* model, const QStringList& headers_list);
@@ -76,6 +78,9 @@ private slots:
     void onActionBindEvent();
     void onActionAppointment();
     void onActionReport();
+    void onActionReserveCopy();
+    void onActionRestore();
+    void onActionCopyRestoreDb();
     void ShowPatientInfo();
     void SetSearchType(QString type);
     void SearchTextChanged(QString text);

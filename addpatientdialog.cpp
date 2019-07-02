@@ -13,8 +13,10 @@ AddPatientDialog::AddPatientDialog(DataBase *data_base, const QVariantList& curr
     photo_path = "";
     ui->sex_cb->addItems (QStringList() << "Чоловіча" << "Жіноча");
     ui->tel_number_le->setInputMask ("38 (000) 000 00 00;_");
+    ui->close_pb->setVisible (false);
 
     if (!row.isEmpty ()){
+        isPicDel = false;
         ui->s_name_le->setText (row.at (SURNAME_COL).toString ());
         ui->name_le->setText (row.at (NAME_COL).toString ());
         ui->f_name_le->setText (row.at (F_NAME_COL).toString ());
@@ -28,18 +30,22 @@ AddPatientDialog::AddPatientDialog(DataBase *data_base, const QVariantList& curr
         photo.loadFromData (row.at (PATIENT_PHOTO_COL).toByteArray ());
         if (!photo.isNull ()){
             ui->patient_photo_lbl->setPixmap(photo.scaledToWidth (ui->patient_photo_lbl->width ()));
+            ui->close_pb->setVisible (true);
         }
         else if (row.at (SEX_COL).toString () == "Чоловіча") {
             ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user.png"));
+            ui->close_pb->setVisible (false);
         }
         else {
             ui->patient_photo_lbl->setPixmap(QPixmap(":/action_icons/default_user_female.png"));
+            ui->close_pb->setVisible (false);
         }
 
         setWindowTitle ("Редагувати картку клієнта");
         EnableAddButton();
     }
 
+    QObject::connect (ui->close_pb, &QPushButton::clicked, this, &AddPatientDialog::onClosePbClick);
     QObject::connect (ui->sex_cb, &QComboBox::currentTextChanged, this, &AddPatientDialog::SexChanged);
     QObject::connect (ui->load_photo_pb, &QPushButton::clicked, this, &AddPatientDialog::LoadPhoto);
     QObject::connect (ui->s_name_le, &QLineEdit::textChanged, this, &AddPatientDialog::EnableAddButton);
@@ -62,13 +68,14 @@ void AddPatientDialog::SexChanged(QString sex) {
 }
 
 void AddPatientDialog::LoadPhoto() {
-    photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", QDir::homePath (), "*.jpg *.png *.bmp");
+    photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото", QDir::homePath (), "*.jpg *.png *.bmp");
     if (QFile(photo_path).size () > 500000){
         QMessageBox::warning (this, "Розмір фото", "Неможливо завантажити вибране фото!\nРозмір файлу з фото не повинен перевищувати 500,0 Кбайт");
         return;
     }
     if (!photo_path.isEmpty ()) {
         ui->patient_photo_lbl->setPixmap (QPixmap(photo_path).scaledToWidth (ui->patient_photo_lbl->width ()));
+        ui->close_pb->setVisible (true);
     }
 }
 
@@ -85,6 +92,13 @@ void AddPatientDialog::EnableAddButton() {
     }
 
     ui->add_pb->setEnabled (!ui->s_name_le->text ().isEmpty () && !ui->name_le->text ().isEmpty () && duplicate_condition);
+}
+
+void AddPatientDialog::onClosePbClick() {
+    photo_path = "";
+    SexChanged(ui->sex_cb->currentText ());
+    ui->close_pb->setVisible (false);
+    isPicDel = true;
 }
 
 QString AddPatientDialog::GetPhotoPath() {
@@ -121,6 +135,10 @@ QString AddPatientDialog::GetTelNumber() {
 
 QString AddPatientDialog::GetIllnesses() {
     return ui->illnesses_te->toPlainText();
+}
+
+bool AddPatientDialog::isPicDeleted() {
+    return isPicDel;
 }
 
 AddPatientDialog::~AddPatientDialog() {

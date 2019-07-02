@@ -15,10 +15,12 @@ class AddPatientDialog : public QDialog
     QString photo_path;
     DataBase* sdb;
     QVariantList row;
+    bool isPicDel;
 private slots:
     void SexChanged(QString sex);
     void LoadPhoto();
     void EnableAddButton();
+    void onClosePbClick();
 public:
     QString GetPhotoPath();
     QString GetSurname();
@@ -29,6 +31,7 @@ public:
     QString GetCity();
     QString GetTelNumber();
     QString GetIllnesses();
+    bool isPicDeleted();
     explicit AddPatientDialog(DataBase* data_base, const QVariantList& row, QWidget *parent = nullptr);
     ~AddPatientDialog();
 
