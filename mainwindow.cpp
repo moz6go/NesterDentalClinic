@@ -553,7 +553,7 @@ void MainWindow::RestoreDb() {
                     }
                     Update(0);
                     ui->statusBar->showMessage ("Базу даних відновлено!");
-                    QMessageBox::information (this, "NDC", "Для коректної роботи після відновлення бази даних, рекомендується перезапутити програму", QMessageBox::Ok);
+                    QMessageBox::information (this, "NDC", "Для коректної роботи після відновлення бази даних, рекомендується перезапустити програму", QMessageBox::Ok);
                 }
                 else {
                     QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
