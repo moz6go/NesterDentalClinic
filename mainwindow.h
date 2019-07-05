@@ -13,6 +13,7 @@
 #include "sqlqueries.h"
 #include "patientvisitsdialog.h"
 #include "reportdialog.h"
+#include "copyrestoredbdialog.h"
 
 class AllEventsDialog;
 class BindEventDialog;
@@ -54,7 +55,7 @@ class MainWindow : public QMainWindow {
     QAction* action_appointment;
 
     QAction* action_report;
-
+    QToolButton* copy_restore_tb;
     QAction* action_copy_restore;
 
     void resizeEvent(QResizeEvent *event);
@@ -66,6 +67,8 @@ class MainWindow : public QMainWindow {
     void GetActiveEventsDateList();
     void CancelEvents();
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
+    void ReserveCopyDb();
+    void RestoreDb();
 private slots:
     void onActionAddPatient();
     void onActionEditPatient();
@@ -78,8 +81,6 @@ private slots:
     void onActionBindEvent();
     void onActionAppointment();
     void onActionReport();
-    void onActionReserveCopy();
-    void onActionRestore();
     void onActionCopyRestoreDb();
     void ShowPatientInfo();
     void SetSearchType(QString type);

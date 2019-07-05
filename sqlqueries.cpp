@@ -2,6 +2,48 @@
 
 SqlQueries::SqlQueries(){}
 
+QString SqlQueries::CreatePatientsTable() {
+    return "CREATE TABLE " + PATIENTS_TABLE + " ("
+            + PATIENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+            + PATIENT_INIT_DATE + " TEXT NOT NULL, "
+            + PATIENT_LAST_CHANGES + " TEXT NOT NULL, "
+            + SURNAME + " TEXT NOT NULL, "
+            + NAME + " TEXT NOT NULL, "
+            + F_NAME + " TEXT NOT NULL, "
+            + B_DATE + " TEXT NOT NULL, "
+            + SEX + " TEXT NOT NULL, "
+            + CITY + " TEXT NOT NULL, "
+            + TEL_NUMBER + " TEXT NOT NULL, "
+            + ILLNESSES + " TEXT NOT NULL, "
+            + PATIENT_PHOTO + " BLOB)";
+}
+
+QString SqlQueries::CreateEventsTable() {
+    return "CREATE TABLE " + EVENTS_TABLE + " ("
+            + EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+            + EVENT_INIT_DATE + " TEXT NOT NULL, "
+            + EVENT_LAST_CHANGES + " TEXT NOT NULL, "
+            + EVENT_DATE + " TEXT NOT NULL, "
+            + EVENT_TIME_FROM + " TEXT NOT NULL, "
+            + EVENT_TIME_TO + " TEXT NOT NULL, "
+            + PATIENT + " TEXT NOT NULL, "
+            + EVENT_STATUS + " TEXT NOT NULL, "
+            + COMMENT + " TEXT, "
+            + PATIENT_ID + " INTEGER)";
+}
+
+QString SqlQueries::CreateVisitsTable() {
+    return "CREATE TABLE " + VISITS_TABLE + " ("
+            + VISIT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+            + VISIT_INIT_DATE + " TEXT NOT NULL, "
+            + VISIT_LAST_CHANGES + " TEXT NOT NULL, "
+            + VISIT_DATE + " TEXT NOT NULL, "
+            + PATIENT + " TEXT NOT NULL, "
+            + PRICE + " REAL NOT NULL, "
+            + VISIT_RESULT + " TEXT NOT NULL, "
+            + EVENT_ID + " INTEGER NOT NULL)";
+}
+
 QString SqlQueries::MaxVisitDateQuery(const QString& patient_id) {
     return "SELECT max(" +  VISIT_DATE + ") FROM"
             " (SELECT " + VISITS_TABLE + "." + VISIT_DATE + ", " + EVENTS_TABLE + "." + PATIENT_ID + " FROM " + VISITS_TABLE +

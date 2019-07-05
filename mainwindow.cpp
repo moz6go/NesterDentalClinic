@@ -124,13 +124,16 @@ void MainWindow::Update(int row) {
 
     events_model->select();
     patients_model->select ();
+
     patients_filter_model->sort (PATIENT_ID_COL, Qt::AscendingOrder);
     ui->patients_table->selectRow (patient_active_row);
     ui->events_table->selectRow(event_active_row);
     ShowPatientInfo();
     CancelEvents();
+
     UpdateButtons();
     GetActiveEventsDateList();
+
 }
 
 void MainWindow::UpdateButtons() {
@@ -156,12 +159,15 @@ void MainWindow::CancelEvents() {
         QString event_id = events_model->data(events_model->index (row, EVENT_ID_COL)).toString();
         QDateTime event_date_time  = QDateTime(events_model->data(events_model->index (row, EVENT_DATE_COL)).toDate (), events_model->data(events_model->index (row, EVENT_TIME_TO_COL)).toTime ());
         QString event_status = events_model->data(events_model->index (row, EVENT_STATUS_COL)).toString();
-        if ( event_date_time < QDateTime::currentDateTime () && event_status == STATUS_LIST[ACTIVE]){
+        if ( event_date_time < QDateTime::currentDateTime () && event_status == STATUS_LIST[ACTIVE]) {
             QVariantList data = { QDateTime::currentDateTime ().toString(SQL_DATE_TIME_FORMAT), STATUS_LIST[CANCELED] };
             QStringList columns = { EVENT_LAST_CHANGES, EVENT_STATUS };
             sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                    sdb->GenerateBindValues (columns),
                                    data);
+            //
+            events_model->select();
+            //
         }
     }
 }
@@ -215,12 +221,15 @@ void MainWindow::onActionAddPatient() {
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (PATIENTS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось створити картку пацієнта! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось створити картку пацієнта! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusBar->showMessage ("Невдалось створити картку пацієнта! Проблема з підключеням до бази даних");
             return;
         }
         Update(patients_filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано пацієнта " + add_patient->GetSurname () + " " + add_patient->GetName ().left (1) + "." + add_patient->GetFName().left(1) + ".");
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -257,7 +266,7 @@ void MainWindow::onActionEditPatient() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (PATIENTS_TABLE, patient_columns, PATIENT_ID, row.at(PATIENT_ID_COL).toString ()),
                                     sdb->GenerateBindValues (patient_columns),
                                     patient_data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusBar->showMessage ("Невдалось відредагувати картку пацієнта! Проблема з підключеням до бази даних");
             return;
         }
@@ -273,6 +282,9 @@ void MainWindow::onActionEditPatient() {
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Відредаговано картку пацієнта " + edit_patient->GetSurname () + " " + edit_patient->GetName ().left (1) + "." + edit_patient->GetFName().left(1) + ".");
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -305,12 +317,15 @@ void MainWindow::onActionAddEvent() {
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (EVENTS_TABLE, columns),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось записати на прийом! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось записати на прийом! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusBar->showMessage ("Невдалось записати на прийом! Проблема з підключеням до бази даних");
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage (add_event->GetPatient () + " записано на прийом " + add_event->GetDate () + " о " + add_event->GetTimeFrom ());
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -340,12 +355,15 @@ void MainWindow::onActionEditEvent() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, row.at(EVENT_ID_COL).toString ()),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось відредагувати дані прийому! Проблема з підключеням до бази даних");
-            ui->statusBar->showMessage ("Невдалось відредагувати дані прийому! Проблема з підключеням до бази даних");
+            ui->statusBar->showMessage ("Невдалось відредагувати дані прийому! Проблема з підключеням до бази даних!");
+            QMessageBox::critical (this, "Error!", "Невдалось відредагувати дані прийому! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Відредаговано дані прийому пацієнта " + row.at(PATIENT_COL).toString());
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -375,12 +393,15 @@ void MainWindow::onActionCancelEvent() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось скасувати прийом! Проблема з підключеням до бази даних");
-            ui->statusBar->showMessage ("Невдалось скасувати прийом! Проблема з підключеням до бази даних");
+            ui->statusBar->showMessage ("Невдалось скасувати прийом! Проблема з підключеням до бази даних!");
+            QMessageBox::critical (this, "Error!", "Невдалось скасувати прийом! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Прийом пацієнта " + patient + " скасовано!");
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -408,12 +429,15 @@ void MainWindow::onActionBindEvent() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (EVENTS_TABLE, columns, EVENT_ID, event_id),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось прив'язати прийом до картки клієнта! Проблема з підключеням до бази даних");
-            ui->statusBar->showMessage ("Невдалось прив'язати прийом до картки клієнта! Проблема з підключеням до бази даних");
+            ui->statusBar->showMessage ("Невдалось прив'язати прийом до картки клієнта! Проблема з підключеням до бази даних!");
+            QMessageBox::critical (this, "Error!", "Невдалось прив'язати прийом до картки клієнта! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Прийом прив'язано до пацієнта " + bind_event->GetPatient ());
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -460,12 +484,15 @@ void MainWindow::onActionAppointment() {
                                     sdb->GenerateBindValues (columns_visits),
                                     data_visits))
         {
-            QMessageBox::critical (this, "Error!", "Невдалось записати дані про візит! Проблема з підключеням до бази даних");
             ui->statusBar->showMessage ("Невдалось записати дані про візит! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось записати дані про візит! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             return;
         }
         Update(ui->patients_table->currentIndex ().row ());
         ui->statusBar->showMessage ("Дані про візит пацієнта " + row.at (PATIENT_COL).toString () + " збережено!");
+    }
+    else {
+        ui->statusBar->clearMessage ();
     }
 }
 
@@ -488,9 +515,12 @@ void MainWindow::onActionReport() {
             CreateReportCSV (table, path);
         }
     }
+    else {
+        ui->statusBar->clearMessage ();
+    }
 }
 
-void MainWindow::onActionReserveCopy() {
+void MainWindow::ReserveCopyDb() {
     QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
                                                     QDir::homePath (),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -499,10 +529,11 @@ void MainWindow::onActionReserveCopy() {
     }
     else {
         ui->statusBar->showMessage ("Не вдалось зробити копію бази даних!");
+        QMessageBox::critical (this, "Error!", "Не вдалось зробити копію бази даних!", QMessageBox::Ok);
     }
 }
 
-void MainWindow::onActionRestore() {
+void MainWindow::RestoreDb() {
     QMessageBox msgbox;
     msgbox.setIcon (QMessageBox::Warning);
     msgbox.setWindowTitle ("Відновлення бази даних");
@@ -536,7 +567,18 @@ void MainWindow::onActionRestore() {
 }
 
 void MainWindow::onActionCopyRestoreDb() {
-
+    CopyRestoreDbDialog* copy_restore_db = new CopyRestoreDbDialog(this);
+    if(copy_restore_db->exec () == QDialog::Accepted){
+        if (copy_restore_db->GetOption () == CREATE_COPY_DB){
+            ReserveCopyDb();
+        }
+        else {
+            RestoreDb();
+        }
+    }
+    else {
+        ui->statusBar->clearMessage ();
+    }
 }
 
 void MainWindow::ShowEventsBySelectedDate() {

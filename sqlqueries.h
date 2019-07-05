@@ -6,6 +6,9 @@ class SqlQueries
 {
 public:
     SqlQueries();
+    static QString CreatePatientsTable();
+    static QString CreateEventsTable();
+    static QString CreateVisitsTable();
     static QString MaxVisitDateQuery(const QString& patient_id);
     static QString PatientVisits(const QString& patient_id);
     static QString VisitsForReport(const QString& date_from, const QString& date_to);

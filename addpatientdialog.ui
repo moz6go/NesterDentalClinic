@@ -367,7 +367,6 @@
    </property>
   </widget>
   <zorder>patient_photo_lbl</zorder>
-  <zorder>layoutWidget1</zorder>
   <zorder>layoutWidget2</zorder>
   <zorder>layoutWidget3</zorder>
   <zorder>warning_lbl</zorder>

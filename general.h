@@ -97,42 +97,8 @@ const QString VISIT_DATE = "visit_date";
 const QString PRICE = "price";
 const QString VISIT_RESULT = "visit_result";
 
-// create queries
-const QString CREATE_PATIENTS_TABLE = "CREATE TABLE " + PATIENTS_TABLE + " ("
-              + PATIENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-              + PATIENT_INIT_DATE + " TEXT NOT NULL, "
-              + PATIENT_LAST_CHANGES + " TEXT NOT NULL, "
-              + SURNAME + " TEXT NOT NULL, "
-              + NAME + " TEXT NOT NULL, "
-              + F_NAME + " TEXT NOT NULL, "
-              + B_DATE + " TEXT NOT NULL, "
-              + SEX + " TEXT NOT NULL, "
-              + CITY + " TEXT NOT NULL, "
-              + TEL_NUMBER + " TEXT NOT NULL, "
-              + ILLNESSES + " TEXT NOT NULL, "
-              + PATIENT_PHOTO + " BLOB)";
-
-const QString CREATE_EVENTS_TABLE =  "CREATE TABLE " + EVENTS_TABLE + " ("
-                + EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-                + EVENT_INIT_DATE + " TEXT NOT NULL, "
-                + EVENT_LAST_CHANGES + " TEXT NOT NULL, "
-                + EVENT_DATE + " TEXT NOT NULL, "
-                + EVENT_TIME_FROM + " TEXT NOT NULL, "
-                + EVENT_TIME_TO + " TEXT NOT NULL, "
-                + PATIENT + " TEXT NOT NULL, "
-                + EVENT_STATUS + " TEXT NOT NULL, "
-                + COMMENT + " TEXT, "
-                + PATIENT_ID + " INTEGER)";
-
-const QString CREATE_VISITS_TABLE =  "CREATE TABLE " + VISITS_TABLE + " ("
-                + VISIT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-                + VISIT_INIT_DATE + " TEXT NOT NULL, "
-                + VISIT_LAST_CHANGES + " TEXT NOT NULL, "
-                + VISIT_DATE + " TEXT NOT NULL, "
-                + PATIENT + " TEXT NOT NULL, "
-                + PRICE + " REAL NOT NULL, "
-                + VISIT_RESULT + " TEXT NOT NULL, "
-                + EVENT_ID + " INTEGER NOT NULL)";
+const QString CREATE_COPY_DB = "Зробити резервну копію бази даних";
+const QString RESTORE_DB = "Відновити з резервної копії";
 
 const QStringList PATIENTS_HEADERS = {
     "Код пацієта",

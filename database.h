@@ -8,10 +8,11 @@ class DataBase : public QObject
     Q_OBJECT
     QSqlDatabase sdb;
     QString last_error;
+    QStringList create_queries;
     bool OpenDataBase(QString db_path);
     bool RestoreDataBase();
 public:
-    DataBase (QObject *parent = nullptr);
+    DataBase (const QStringList& create_tables_queries, QObject *parent = nullptr);
     ~DataBase ();
     QString LastError();
     bool ConnectToDataBase(QString db_path);

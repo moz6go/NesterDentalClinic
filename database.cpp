@@ -1,6 +1,8 @@
 #include "database.h"
 
-DataBase::DataBase(QObject *parent) : QObject(parent) {}
+DataBase::DataBase(const QStringList& create_tables_queries, QObject *parent) : QObject(parent) {
+    create_queries = create_tables_queries;
+}
 
 DataBase::~DataBase() {
     CloseDataBase();
@@ -52,17 +54,11 @@ bool DataBase::RestoreDataBase() {
 bool DataBase::CreateDataBase() {
     QSqlQuery query;
 
-    if(!query.exec (CREATE_PATIENTS_TABLE))  {
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_EVENTS_TABLE))  {
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_VISITS_TABLE))  {
-        last_error = sdb.lastError ().text ();
-        return false;
+    for (auto& cr_query : create_queries) {
+        if(!query.exec (cr_query))  {
+            last_error = sdb.lastError ().text ();
+            return false;
+        }
     }
     return true;
 }

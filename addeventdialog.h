@@ -18,7 +18,7 @@ class AddEventDialog : public QDialog
     QString event_id;
 private slots:
     void SetTimeTo(QTime time_from);
-    void SetMinTimeFrom();
+//    void SetMinTimeFrom();
     void EnabledOkButton();
     void CheckFreeTime();
 public:

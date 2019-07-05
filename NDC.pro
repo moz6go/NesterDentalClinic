@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     patientvisitsdialog.cpp \
     mysqlquerymodel.cpp \
     myeventsproxymodel.cpp \
-    reportdialog.cpp
+    reportdialog.cpp \
+    copyrestoredbdialog.cpp
 
 HEADERS  += mainwindow.h \
     appointmentdialog.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     patientvisitsdialog.h \
     mysqlquerymodel.h \
     myeventsproxymodel.h \
-    reportdialog.h
+    reportdialog.h \
+    copyrestoredbdialog.h
 
 FORMS    += mainwindow.ui \
     addpatientdialog.ui \
@@ -49,7 +51,8 @@ FORMS    += mainwindow.ui \
     appointmentdialog.ui \
     bindeventdialog.ui \
     patientvisitsdialog.ui \
-    reportdialog.ui
+    reportdialog.ui \
+    copyrestoredbdialog.ui
 
 RESOURCES += \
     res/res.qrc
